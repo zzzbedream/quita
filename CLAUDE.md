@@ -6,13 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado actual del repositorio
 
-**El repositorio está vacío: solo existe `SPRINT-6-DIAS-prompts.md`. No hay código, ni `package.json`, ni repositorio git inicializado.**
+**Construido y verificado en local el 11 de septiembre de 2026. Pendiente únicamente de despliegue real (faltan fondos de testnet) y de grabar el vídeo.**
 
-El plan del sprint sitúa el scaffold en D1 (lunes 7 de septiembre). Hoy es **viernes 11 de septiembre de 2026 (D5)** y el deadline es el **domingo 13 a las 23:59 ET**. El sprint va con cuatro días de retraso sobre el calendario escrito y quedan poco más de dos días.
+Repo público: https://github.com/zzzbedream/quita
 
-Antes de empezar cualquier tarea, confirma con el usuario qué tramo del plan corresponde ejecutar. Si se arranca ahora desde cero, aplica el orden de sacrificio de la sección "Regla de recorte" y asume que el alcance realista es el mínimo viable: `QuitaOrigin` en Sepolia + una verificación real en Creditcoin + `ATTESTCOIN_INTEGRATION.md` + vídeo.
+Hecho:
+- Los 6 contratos, con los 4 eventos verificados a través de 3 consumidores.
+- 79 tests en verde (<2s), 88% de statements / 91% de líneas. Cero errores de tipos.
+- Worker persistente, scripts de despliegue, demo end-to-end, dashboard, deck PDF de 10 slides, guion de vídeo y runbook.
+- `docs/ATTESTCOIN_INTEGRATION.md` — el documento que puntúa.
+- `npm run probe` confirma contra la red real que el precompile ChainInfo responde y que `chainKey 1` es Sepolia.
 
-El plan completo día a día, con los prompts originales, está en [SPRINT-6-DIAS-prompts.md](SPRINT-6-DIAS-prompts.md). Es la fuente de verdad del alcance; este archivo resume lo que no puede perderse entre sesiones.
+Pendiente y bloqueado por fondos:
+- Despliegue en Sepolia y CC3 (faucet de CC3 = Discord, manual).
+- `verify.e2e.ts` nunca se ha ejecutado contra el prover real.
+- Rellenar la tabla de direcciones desplegadas del README.
+- Grabar el vídeo (campo obligatorio del formulario).
+
+Las decisiones tomadas sin preguntar están en [ASSUMPTIONS.md](ASSUMPTIONS.md). El plan original día a día sigue en [SPRINT-6-DIAS-prompts.md](SPRINT-6-DIAS-prompts.md) como referencia histórica; **ojo, varias de sus premisas técnicas resultaron incorrectas** y están corregidas en ASSUMPTIONS.md.
 
 ---
 
@@ -46,15 +57,18 @@ Dos cadenas, con separación estricta de responsabilidades:
 
 Flujo completo: evento en Sepolia → finalidad (~12,8 min) → atestación → `ProofBuilder.getProof` → llamada al contrato en Creditcoin → `verifyAndEmit` del precompile → mutación de estado.
 
-`UscConsumer.sol` es la clase base abstracta de todo contrato que verifica pruebas. Su `_consume(...)` ejecuta este orden **exacto**, y el orden importa:
+`QuitaConsumer.sol` (que extiende `ASCBase` de `@gluwa/asc-contracts`) es la base de todo contrato que verifica pruebas. El orden completo, y el orden importa:
 
-1. calcula `txIndex` desde el merkle proof
-2. replay: `key = keccak256(abi.encodePacked(chainKey, blockHeight, txIndex))`; revierte si ya procesado
-3. `VERIFIER.verifyAndEmit(...)`; revierte si `false`
-4. marca procesado
-5. valida el tipo de transacción
-6. decodifica el recibo y **revierte si `receiptStatus != 1`**
-7. devuelve `ReceiptFields`
+1. **chainKey fijado** al de la cadena fuente  ← nuestro, en `executeFromSource`
+2. calcula `txIndex` desde el merkle proof  ← ASCBase
+3. replay: `queryId = keccak256(chainKey, blockHeight, txIndex)`; revierte si ya procesado  ← ASCBase
+4. `VERIFIER.verifyAndEmit(...)`; revierte si `false`  ← ASCBase
+5. marca procesado  ← ASCBase
+6. valida el tipo de transacción  ← nuestro
+7. decodifica el recibo y **revierte si `receiptStatus != 1`**  ← nuestro
+8. **valida el ADDRESS del emisor**  ← nuestro
+
+`ASCBase.execute` es `external` y NO `virtual`: no se puede sobreescribir y no pasa el `chainKey` al handler. Por eso el entrypoint bueno es `executeFromSource`, y el heredado se deja **inerte** (revierte con `DirectExecuteDisabled`).
 
 ---
 
@@ -75,7 +89,7 @@ SDK                        : @gluwa/usc-sdk (peer dep ethers v6)
 Batch                      : máx 10 pruebas, rango 1000 bloques
 ```
 
-Referencia de código: `github.com/gluwa/usc-testnet-bridge-examples` (`USCMinter.sol`, `hello-bridge`). Copiar y adaptar antes que escribir desde cero — `INativeQueryVerifier.sol` y `EvmV1Decoder.sol` salen de ahí.
+Referencia de código: `github.com/gluwa/usc-testnet-bridge-examples` (`ASCMinter.sol`, `hello-bridge`). **`INativeQueryVerifier.sol` y `EvmV1Decoder.sol` NO están sueltos en ese repo**: se importan del paquete npm `@gluwa/asc-contracts@0.2.1`, que además trae `ASCBase`. Eso obliga a Solidity **0.8.28** y a `viaIR: true`.
 
 **Writability (Creditcoin → Ethereum) no está disponible:** la doc oficial dice que está *"undergoing 3rd party testing and audits"*. La integración es solo lectura Ethereum → Creditcoin. Es la respuesta correcta si el jurado pregunta.
 
@@ -83,7 +97,7 @@ Referencia de código: `github.com/gluwa/usc-testnet-bridge-examples` (`USCMinte
 
 ## Cuatro advertencias críticas
 
-**(a) El precompile `0x0FD2` es código Rust nativo del runtime, no bytecode.** Un fork de Hardhat no lo tiene. Todo contrato que verifique debe recibir el verificador **por interfaz inyectada en el constructor**, nunca hardcodeado. Sin esto no hay tests locales posibles — de ahí `MockVerifier.sol`.
+**(a) El precompile `0x0FD2` es código Rust nativo del runtime, no bytecode.** Un fork de Hardhat no lo tiene. `ASCBase` lo hardcodea y no admite inyección por constructor, así que en local se instala bytecode mock **en la propia dirección `0xFD2` con `hardhat_setCode`** (ver `test/helpers/attestcoin.ts`). Funciona: es lo que hace testeable todo lo demás.
 
 **(b) El precompile no valida si la transacción tuvo éxito.** Hay que comprobar `receiptStatus == 1` a mano. Omitirlo permite probar una transacción **revertida** cuyos logs existieron en la simulación, y colar un siniestro fraudulento.
 
@@ -109,12 +123,12 @@ Los vectores de ataque de (b) y (c) van documentados en NatSpec de 4-5 líneas e
 
 ---
 
-## Estructura prevista
+## Estructura
 
 ```
 contracts/
   origin/QuitaOrigin.sol            Sepolia. 4 eventos, Ownable, lenders y atestadores registrados
-  creditcoin/UscConsumer.sol        abstracto: _consume, _requireLogFrom
+  creditcoin/QuitaConsumer.sol      abstracto, is ASCBase: executeFromSource, receiptStatus, emisor
   creditcoin/LoanMirror.sol         saldo insoluto verificado
   creditcoin/PolicyRegistry.sol     underwrite, accruePremium, syncSumInsured
   creditcoin/CapitalPool.sol        depósitos LP, lockedCapital, MCR, vistas públicas
@@ -122,7 +136,7 @@ contracts/
   interfaces/INativeQueryVerifier.sol
   libs/EvmV1Decoder.sol             adaptada del repo de Gluwa
   libs/WadMath.sol                  wmul, wdiv sobre 1e18
-  mocks/MockVerifier.sol            true/false configurable, para tests locales
+  mocks/MockNativeQueryVerifier.sol  se instala en 0xFD2 con hardhat_setCode
   mocks/MockStable.sol              ERC20 de 6 decimales
 worker/src/    watcher · queue · prover · submitter · index (SQLite vía better-sqlite3)
 frontend/      Vite + React + wagmi/viem. Una página, solo lectura + panel de demo
@@ -137,12 +151,12 @@ Las cuatro firmas de evento de `QuitaOrigin` son **exactas** y están en [SPRINT
 
 ## Comandos
 
-Toolchain: **Hardhat + TypeScript, Solidity ^0.8.23, OpenZeppelin, dotenv, ethers v6.** Nada de esto existe todavía; lo crea el scaffold de D1.
+Toolchain: **Hardhat 2.29.1 + TypeScript, Solidity 0.8.28 con `viaIR`, OpenZeppelin, ethers v6.**
 
 ```bash
 npx hardhat compile
 npx hardhat test                                   # objetivo: verde en <30s
-npx hardhat test test/LoanMirror.t.ts              # un solo fichero
+npx hardhat test test/LoanMirror.test.ts           # un solo fichero
 npx hardhat test --grep "replay"                   # un solo caso (mocha --grep)
 
 npx hardhat run scripts/probe.ts --network creditcoin        # cadenas soportadas + qué URL del prover responde
