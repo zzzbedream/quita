@@ -135,7 +135,7 @@ export function buildProof(txIndex: number, blockHeight: bigint = 100n): ProofFi
 export function proofArgs(proof: ProofFixture) {
   return [
     proof.merkleRoot,
-    proof.siblings.map((s) => [s.hash, s.isLeft] as [string, boolean]),
+    proof.siblings.map((s) => ({ hash: s.hash, isLeft: s.isLeft })),
     proof.lowerEndpointDigest,
     proof.continuityRoots,
   ] as const;

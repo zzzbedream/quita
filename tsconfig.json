@@ -10,6 +10,6 @@
     "resolveJsonModule": true,
     "outDir": "dist"
   },
-  "include": ["./scripts", "./test", "./worker", "./hardhat.config.ts"],
+  "include": ["./scripts", "./test", "./worker", "./typechain-types", "./hardhat.config.ts"],
   "exclude": ["node_modules", "frontend"]
 }
