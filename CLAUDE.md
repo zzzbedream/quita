@@ -23,7 +23,7 @@ Pendiente y bloqueado por fondos:
 - Rellenar la tabla de direcciones desplegadas del README.
 - Grabar el vídeo (campo obligatorio del formulario).
 
-Las decisiones tomadas sin preguntar están en [ASSUMPTIONS.md](ASSUMPTIONS.md). El plan original día a día sigue en [SPRINT-6-DIAS-prompts.md](SPRINT-6-DIAS-prompts.md) como referencia histórica; **ojo, varias de sus premisas técnicas resultaron incorrectas** y están corregidas en ASSUMPTIONS.md.
+Las decisiones tomadas sin preguntar están en [ASSUMPTIONS.md](ASSUMPTIONS.md), incluidas las premisas técnicas del plan original que resultaron incorrectas y cómo se corrigieron.
 
 ---
 
@@ -145,7 +145,7 @@ scripts/       probe · deploy.origin · deploy.creditcoin · deploy.all · emit
 test/ docs/ deployments/
 ```
 
-Las cuatro firmas de evento de `QuitaOrigin` son **exactas** y están en [SPRINT-6-DIAS-prompts.md](SPRINT-6-DIAS-prompts.md) (sección D1, tarea 3): `LoanDisbursed`, `RepaymentMade`, `PremiumPaid`, `DeathAttested`. Cualquier cambio rompe los decoders.
+Las cuatro firmas de evento de `QuitaOrigin` son **exactas** (ver el contrato): `LoanDisbursed`, `RepaymentMade`, `PremiumPaid`, `DeathAttested`. Cualquier cambio rompe los decoders del otro lado.
 
 ---
 
