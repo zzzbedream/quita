@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Quita — BUIDL CTC 2026 Fall</title>
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #10171f;
+    --muted: #5b6672;
+    --line: #d8dee6;
+    --accent: #0b5d3b;
+    --accent-soft: #e8f2ed;
+    --warn: #8a4b12;
+    --warn-soft: #fbf0e4;
+    --paper: #fbfbf9;
+  }
+
+  html { font-family: "Segoe UI", Inter, system-ui, sans-serif; color: var(--ink); }
+  body { background: #8892a0; }
+
+  .slide {
+    width: 1280px; height: 720px;
+    background: var(--paper);
+    padding: 64px 72px;
+    display: flex; flex-direction: column;
+    position: relative;
+    page-break-after: always;
+    overflow: hidden;
+  }
+  .slide + .slide { margin-top: 24px; }
+  .slide:last-child { page-break-after: auto; }
+
+  @media print {
+    body { background: #fff; }
+    .slide { margin: 0 !important; page-break-inside: avoid; break-inside: avoid; }
+    .slide + .slide { margin-top: 0 !important; }
+  }
+
+  .num {
+    position: absolute; right: 40px; bottom: 28px;
+    font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .brand {
+    position: absolute; left: 72px; bottom: 28px;
+    font-size: 15px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase;
+  }
+
+  h1 { font-size: 88px; line-height: 1.02; letter-spacing: -.03em; font-weight: 700; }
+  h2 { font-size: 46px; line-height: 1.1; letter-spacing: -.02em; font-weight: 650; margin-bottom: 28px; }
+  .kicker {
+    font-size: 17px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); font-weight: 650; margin-bottom: 22px;
+  }
+  p, li { font-size: 26px; line-height: 1.5; color: var(--ink); }
+  .muted { color: var(--muted); }
+  .small { font-size: 19px; line-height: 1.45; }
+  .tiny { font-size: 15px; line-height: 1.45; color: var(--muted); }
+
+  ul { list-style: none; }
+  li { position: relative; padding-left: 34px; margin-bottom: 16px; }
+  li::before {
+    content: ""; position: absolute; left: 8px; top: 16px;
+    width: 9px; height: 9px; background: var(--accent); border-radius: 50%;
+  }
+
+  .stat-row { display: flex; gap: 22px; margin-top: 12px; }
+  .stat {
+    flex: 1; background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; padding: 26px 24px;
+  }
+  .stat .figure { font-size: 52px; font-weight: 700; letter-spacing: -.025em; line-height: 1; }
+  .stat .label { font-size: 17px; color: var(--muted); margin-top: 12px; line-height: 1.35; }
+
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 12px 14px; font-size: 21px; border-bottom: 1px solid var(--line); }
+  th { font-size: 15px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 650; }
+  .ok { color: var(--accent); font-weight: 650; }
+  .tr { color: var(--warn); font-weight: 650; }
+
+  code, pre { font-family: "Cascadia Mono", Consolas, monospace; }
+  pre {
+    background: #11181f; color: #e8eef4; border-radius: 12px;
+    padding: 24px 28px; font-size: 21px; line-height: 1.55; overflow: hidden;
+  }
+  pre .c { color: #8fa3b5; }
+  pre .g { color: #7fd6a6; }
+  pre .y { color: #e8c07d; }
+
+  .callout {
+    background: var(--accent-soft); border-left: 5px solid var(--accent);
+    padding: 22px 26px; border-radius: 0 10px 10px 0; font-size: 24px; line-height: 1.45;
+  }
+  .callout.warn { background: var(--warn-soft); border-left-color: var(--warn); }
+
+  .cols { display: flex; gap: 32px; flex: 1; }
+  .col { flex: 1; }
+
+  .flow {
+    display: flex; align-items: stretch; gap: 14px; margin-top: 8px;
+  }
+  .node {
+    flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    padding: 20px 18px; font-size: 18px; line-height: 1.4;
+  }
+  .node .t { font-weight: 700; font-size: 20px; margin-bottom: 8px; }
+  .node.hl { border-color: var(--accent); background: var(--accent-soft); }
+  .arrow { display: flex; align-items: center; color: var(--muted); font-size: 26px; }
+
+  .fill { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide">
+  <div class="fill" style="display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">BUIDL CTC 2026 Fall &nbsp;·&nbsp; Track: RWA</div>
+    <h1>Quita</h1>
+    <p style="font-size:34px;margin-top:26px;max-width:940px;line-height:1.35">
+      On-chain credit life insurance with a loss ratio you can
+      <strong>verify</strong> instead of believe.
+    </p>
+    <p class="muted small" style="margin-top:34px">
+      Built on the Attestcoin Protocol · Ethereum Sepolia → Creditcoin CC3 Testnet
+    </p>
+  </div>
+  <div class="brand">Quita</div><div class="num">1 / 10</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <h2>An enormous market where nobody can check the numbers</h2>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="figure">R$30B</div>
+      <div class="label">Annual credit life premium in Brazil</div>
+    </div>
+    <div class="stat">
+      <div class="figure">~18%</div>
+      <div class="label">Returned as claims</div>
+    </div>
+    <div class="stat">
+      <div class="figure">up to 87%</div>
+      <div class="label">Captured as bank commission</div>
+    </div>
+  </div>
+  <p style="margin-top:34px;max-width:1050px">
+    Tying the policy to the loan has been litigated for years in Brazil. But the structural
+    problem is simpler: <strong>every one of these numbers is a disclosure.</strong> The insurer
+    states the loss ratio. Nobody outside the insurer can verify it.
+  </p>
+  <div class="fill"></div>
+  <p class="tiny" style="max-width:1050px">
+    Source: analysis of Tema 972 litigation and industry commentary. Pending cross-check against
+    public SUSEP statistics. Presented as order of magnitude, not audited data.
+  </p>
+  <div class="brand">Quita</div><div class="num">2 / 10</div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">The gap</div>
+  <h2>The people most exposed have the least cover</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="stat" style="margin-bottom:20px">
+        <div class="figure">~50%</div>
+        <div class="label">of the Latin American workforce is informal</div>
+      </div>
+      <div class="stat">
+        <div class="figure">$267B</div>
+        <div class="label">regional protection gap</div>
+      </div>
+    </div>
+    <div class="col">
+      <p>
+        Non-bank credit — the lenders actually serving informal workers — has essentially no
+        credit life layer underneath it.
+      </p>
+      <p style="margin-top:22px">
+        Not because the risk is unattractive, but because there is no infrastructure a small
+        lender can plug into without becoming an insurer.
+      </p>
+    </div>
+  </div>
+  <div class="brand">Quita</div><div class="num">3 / 10</div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">The solution</div>
+  <h2>Same product. Auditable in real time.</h2>
+  <p style="max-width:1080px">
+    Quita is infrastructure a lender puts underneath a credit life book. The insured balance,
+    the reserves, the premium and the claims all become on-chain state that moves
+    <strong>only when something was cryptographically proved</strong>.
+  </p>
+  <pre style="margin-top:30px"><span class="c">// CapitalPool.sol — the entire commercial argument</span>
+<span class="y">function</span> lossRatioWad() <span class="y">external view returns</span> (uint256) {
+    <span class="y">if</span> (totalPremiumsCollected == 0) <span class="y">return</span> 0;
+    <span class="y">return</span> totalClaimsPaid.wdiv(totalPremiumsCollected);
+}</pre>
+  <p style="margin-top:28px">
+    Both counters are moved by verified events. Neither can be asserted by an operator.
+  </p>
+  <div class="brand">Quita</div><div class="num">4 / 10</div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">How it works</div>
+  <h2>The loan lives on Ethereum. The cover lives on Creditcoin.</h2>
+  <div class="flow">
+    <div class="node">
+      <div class="t">Ethereum Sepolia</div>
+      QuitaOrigin emits 4 loan events. No insurance logic.
+    </div>
+    <div class="arrow">→</div>
+    <div class="node">
+      <div class="t">Finality ~12.8 min</div>
+      Attestors sign the block. Off-chain worker builds the inclusion proof.
+    </div>
+    <div class="arrow">→</div>
+    <div class="node hl">
+      <div class="t">Precompile 0xFD2</div>
+      Merkle inclusion + continuity verified <strong>synchronously, in-transaction</strong>.
+    </div>
+    <div class="arrow">→</div>
+    <div class="node">
+      <div class="t">Creditcoin CC3</div>
+      LoanMirror · PolicyRegistry · CapitalPool · ClaimEngine
+    </div>
+  </div>
+  <div class="callout" style="margin-top:34px">
+    No oracle operator anywhere in that path. The worker can withhold or delay.
+    It <strong>cannot fabricate</strong>.
+  </div>
+  <div class="brand">Quita</div><div class="num">5 / 10</div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">The slide that matters</div>
+  <h2>Verified vs trusted</h2>
+  <table>
+    <tr><th>Fact</th><th style="width:150px">Status</th><th>Mechanism</th></tr>
+    <tr><td>Loan exists, principal, repayments</td><td class="ok">VERIFIED</td><td class="small">Merkle inclusion via 0xFD2</td></tr>
+    <tr><td><strong>Outstanding balance</strong></td><td class="ok">VERIFIED</td><td class="small">Copied from the proved log</td></tr>
+    <tr><td>Premium collected, claims paid</td><td class="ok">VERIFIED</td><td class="small">Counters moved only by proofs</td></tr>
+    <tr><td>Transaction succeeded</td><td class="ok">VERIFIED</td><td class="small">receiptStatus == 1</td></tr>
+    <tr><td>Log came from our contract</td><td class="ok">VERIFIED</td><td class="small">Emitter pinned, immutable</td></tr>
+    <tr><td><strong>Payout amount</strong></td><td class="ok">VERIFIED</td><td class="small">min(sumInsured, verified outstanding)</td></tr>
+    <tr><td><strong>The borrower actually died</strong></td><td class="tr">TRUSTED</td><td class="small">2-of-3 threshold + challenge window</td></tr>
+  </table>
+  <div class="callout warn" style="margin-top:26px">
+    Death is a fact about the world. No protocol can verify it. Anyone claiming to have
+    oracle-ised mortality is describing a trusted attestor with extra steps.
+  </div>
+  <div class="brand">Quita</div><div class="num">6 / 10</div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">Attestcoin integration depth</div>
+  <h2>Four events verified. Three attacks closed.</h2>
+  <div class="cols">
+    <div class="col">
+      <p class="small muted" style="text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Verified events</p>
+      <table>
+        <tr><td class="small">LoanDisbursed</td><td class="small muted">LoanMirror</td></tr>
+        <tr><td class="small">RepaymentMade</td><td class="small muted">LoanMirror</td></tr>
+        <tr><td class="small">PremiumPaid</td><td class="small muted">PolicyRegistry</td></tr>
+        <tr><td class="small">DeathAttested</td><td class="small muted">ClaimEngine</td></tr>
+      </table>
+      <p class="small" style="margin-top:22px">
+        PremiumPaid is verified because it is the <em>denominator</em> of the loss ratio.
+      </p>
+    </div>
+    <div class="col">
+      <p class="small muted" style="text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Attacks closed</p>
+      <ul>
+        <li class="small"><strong>Reverted tx.</strong> Inclusion ≠ success. Emit, revert, prove, collect — unless receiptStatus is checked.</li>
+        <li class="small"><strong>Clone.</strong> Event signatures are unowned. Pin the emitter or anyone mints claims.</li>
+        <li class="small"><strong>Cross-chain confusion.</strong> ASCBase never passes chainKey to the handler. We added a guarded entrypoint and made the inherited one inert.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="brand">Quita</div><div class="num">7 / 10</div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">Ecosystem fit</div>
+  <h2>Nine years of real loans. Zero risk layer.</h2>
+  <div class="stat-row">
+    <div class="stat"><div class="figure">9 yrs</div><div class="label">Creditcoin recording real-world credit on-chain</div></div>
+    <div class="stat"><div class="figure">$100M+</div><div class="label">in loans registered</div></div>
+    <div class="stat"><div class="figure">2M+</div><div class="label">borrowers reached via partners such as Aella</div></div>
+  </div>
+  <p style="margin-top:36px;max-width:1080px">
+    There is no insurance or risk layer on top of any of it. <strong>Loan Flow on Creditcoin
+    EVM</strong> is on the roadmap — Quita is a non-trivial first consumer, and credit life is the
+    single product every one of those lenders already needs.
+  </p>
+  <div class="brand">Quita</div><div class="num">8 / 10</div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kicker">Honesty</div>
+  <h2>Declared limitations &amp; roadmap</h2>
+  <div class="cols">
+    <div class="col">
+      <p class="small muted" style="text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">What we are not claiming</p>
+      <ul>
+        <li class="small">Death attestation is <strong>trusted</strong>. Threshold and challenge window mitigate; they do not eliminate.</li>
+        <li class="small">The stablecoin is a <strong>mock</strong>.</li>
+        <li class="small">Mortality table is a <strong>declared placeholder</strong>, pending BR-EMS 2021 from SUSEP.</li>
+        <li class="small">We are <strong>not the insurer</strong>. Infrastructure, not a carrier.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <p class="small muted" style="text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Roadmap</p>
+      <ul>
+        <li class="small">Attestor bonds and slashing</li>
+        <li class="small">BR-EMS 2021 with SUSEP filing</li>
+        <li class="small">Batch verification (10 proofs / call)</li>
+        <li class="small">Writability: mark loans extinguished back on Ethereum, once it leaves audit</li>
+        <li class="small">Full ERC-4626 vault · disability cover · mainnet</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:20px">
+    A limitation you declare is worth more than the same limitation someone else finds.
+  </div>
+  <div class="brand">Quita</div><div class="num">9 / 10</div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="fill" style="display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Thank you</div>
+    <h1 style="font-size:72px">Quita</h1>
+    <p style="font-size:30px;margin-top:24px;max-width:900px;line-height:1.4">
+      Credit life cover where the loss ratio is a computation, not a claim.
+    </p>
+    <table style="margin-top:40px;max-width:840px">
+      <tr><td class="small muted" style="width:210px">Track</td><td class="small">RWA</td></tr>
+      <tr><td class="small muted">Repository</td><td class="small">github.com/zzzbedream/quita</td></tr>
+      <tr><td class="small muted">Technical write-up</td><td class="small">docs/ATTESTCOIN_INTEGRATION.md</td></tr>
+      <tr><td class="small muted">Tests</td><td class="small">79 passing · 88% statement coverage</td></tr>
+      <tr><td class="small muted">Team</td><td class="small">Solo developer</td></tr>
+    </table>
+  </div>
+  <div class="brand">Quita</div><div class="num">10 / 10</div>
+</section>
+
+</body>
+</html>

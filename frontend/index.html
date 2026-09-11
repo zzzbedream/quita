@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quita — Verified Credit Life Book</title>
+<style>
+  :root {
+    --paper:   #f7f6f2;
+    --ink:     #12181d;
+    --muted:   #64707c;
+    --line:    #dfe3e8;
+    --card:    #ffffff;
+    --green:   #0b5d3b;
+    --green-s: #e9f2ed;
+    --amber:   #8a4b12;
+    --amber-s: #fbf0e4;
+    --red:     #8c2b20;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    padding: 0 0 80px;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---- masthead ---- */
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding: 34px 0 20px;
+    margin-bottom: 40px;
+  }
+  .masthead { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .logo { font-size: 40px; font-weight: 700; letter-spacing: -.03em; }
+  .tagline { font-size: 15px; color: var(--muted); max-width: 460px; }
+  .net {
+    font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); display: flex; gap: 18px; margin-top: 12px; flex-wrap: wrap;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #bbb; display: inline-block; margin-right: 7px; vertical-align: middle; }
+  .dot.live { background: var(--green); }
+  .dot.down { background: var(--red); }
+
+  /* ---- trust header: the largest thing on the page ---- */
+  .trust {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .metric { background: var(--card); padding: 28px 26px; }
+  .metric .k {
+    font-size: 12px; letter-spacing: .11em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin-bottom: 14px;
+  }
+  .metric .v {
+    font-size: 46px; font-weight: 700; letter-spacing: -.03em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .metric.hero .v { font-size: 68px; color: var(--green); }
+  .metric .note { font-size: 13px; color: var(--muted); margin-top: 12px; line-height: 1.4; }
+  .metric .bench {
+    display: inline-block; margin-top: 12px; padding: 4px 10px;
+    background: var(--amber-s); color: var(--amber);
+    border-radius: 999px; font-size: 12px; font-weight: 600;
+  }
+
+  .verified-note {
+    font-size: 13px; color: var(--muted); margin-bottom: 44px; padding-left: 2px;
+  }
+
+  /* ---- sections ---- */
+  section { margin-bottom: 44px; }
+  h2 {
+    font-size: 13px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--muted); font-weight: 650;
+    padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 20px;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 11px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--muted); font-weight: 650; padding: 0 14px 10px 0;
+  }
+  td {
+    padding: 14px 14px 14px 0; border-top: 1px solid var(--line);
+    font-size: 15px; font-variant-numeric: tabular-nums;
+  }
+  td.mono, .mono { font-family: "Cascadia Mono", Consolas, monospace; font-size: 13px; }
+  .num { text-align: right; }
+
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 650;
+  }
+  .pill.active { background: var(--green-s); color: var(--green); }
+  .pill.claimed { background: var(--amber-s); color: var(--amber); }
+
+  a { color: var(--green); text-decoration: none; border-bottom: 1px solid rgba(11,93,59,.28); }
+  a:hover { border-bottom-color: var(--green); }
+
+  /* ---- verification feed ---- */
+  .feed-item {
+    display: grid; grid-template-columns: 180px 1fr auto;
+    gap: 18px; align-items: center;
+    padding: 15px 0; border-top: 1px solid var(--line);
+  }
+  .feed-item .ev { font-weight: 650; font-size: 15px; }
+  .feed-item .chain-pair { font-size: 13px; color: var(--muted); }
+  .chain-pair .arrow { color: var(--green); font-weight: 700; margin: 0 8px; }
+
+  .empty {
+    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
+    padding: 34px 30px; color: var(--muted); font-size: 15px;
+  }
+  .empty strong { color: var(--ink); }
+  .empty code {
+    background: var(--paper); padding: 2px 7px; border-radius: 5px;
+    font-family: "Cascadia Mono", Consolas, monospace; font-size: 13px;
+  }
+
+  .banner {
+    background: var(--amber-s); border-left: 4px solid var(--amber);
+    padding: 16px 20px; border-radius: 0 10px 10px 0;
+    font-size: 14px; color: #5c3a13; margin-bottom: 34px;
+  }
+
+  footer {
+    border-top: 1px solid var(--line); padding-top: 22px; margin-top: 20px;
+    font-size: 13px; color: var(--muted);
+  }
+  footer p + p { margin-top: 8px; }
+
+  @media (max-width: 860px) {
+    .trust { grid-template-columns: 1fr 1fr; }
+    .metric.hero .v { font-size: 52px; }
+    .feed-item { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="masthead">
+      <div>
+        <div class="logo">Quita</div>
+        <div class="tagline">
+          Credit life cover where the loss ratio is a computation, not a claim.
+        </div>
+      </div>
+      <div class="net">
+        <span><span class="dot" id="net-dot"></span><span id="net-status">connecting…</span></span>
+        <span id="net-block">block —</span>
+        <span>CC3 Testnet · 102031</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="banner" id="demo-banner" hidden>
+    Demonstration deployment. The challenge window is shortened to
+    <strong id="cw-value">—</strong> so a claim can be settled on camera; production default is 24 hours.
+    It is an owner-settable parameter that emits an event on change, not a special case in settlement.
+  </div>
+
+  <!-- Trust header -->
+  <div class="trust">
+    <div class="metric hero">
+      <div class="k">Loss ratio</div>
+      <div class="v" id="loss-ratio">—</div>
+      <div class="bench">Brazilian market benchmark ~18%</div>
+    </div>
+    <div class="metric">
+      <div class="k">Solvency vs MCR</div>
+      <div class="v" id="solvency">—</div>
+      <div class="note" id="mcr-note">—</div>
+    </div>
+    <div class="metric">
+      <div class="k">Reserves</div>
+      <div class="v" id="reserves">—</div>
+      <div class="note" id="capacity-note">—</div>
+    </div>
+    <div class="metric">
+      <div class="k">Insured balance</div>
+      <div class="v" id="insured">—</div>
+      <div class="note" id="policy-note">—</div>
+    </div>
+  </div>
+  <p class="verified-note">
+    Every figure above derives from Ethereum events whose inclusion was cryptographically
+    verified by the Attestcoin BlockProver precompile. None of it can be asserted by an operator.
+  </p>
+
+  <!-- Policies -->
+  <section>
+    <h2>Active policies</h2>
+    <div id="policies-empty" class="empty" hidden>
+      No policies yet. Policies can only exist over loans that arrived through a verified proof —
+      there is deliberately no operator path to create one.
+    </div>
+    <table id="policies-table" hidden>
+      <thead>
+        <tr>
+          <th>Loan</th><th>Age band</th><th>Sex</th>
+          <th class="num">Sum insured</th><th class="num">Premium accrued</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="policies-body"></tbody>
+    </table>
+  </section>
+
+  <!-- Verification feed -->
+  <section>
+    <h2>Attestcoin verification feed</h2>
+    <div id="feed-empty" class="empty" hidden>
+      Nothing verified yet. Run <code>npm run emit:demo</code> on Sepolia, then
+      <code>npm run verify:e2e</code> — each verified event appears here with links to both chains.
+    </div>
+    <div id="feed"></div>
+  </section>
+
+  <footer>
+    <p>
+      <strong>Verified:</strong> the loan exists, the principal, every repayment, the outstanding
+      balance, premium collected, that the transaction succeeded, that the log came from our
+      contract, that the proof is not a replay, and the payout amount.
+    </p>
+    <p>
+      <strong>Trusted:</strong> that the borrower actually died — mitigated by a 2-of-3 attestor
+      threshold and a challenge window, not eliminated. Settlement asset is a demo token and the
+      mortality table is a declared placeholder pending BR-EMS 2021.
+    </p>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script>
+const RPC = "https://rpc.cc3-testnet.creditcoin.network";
+const EXPLORER_CC = "https://creditcoin-testnet.blockscout.com";
+const EXPLORER_ETH = "https://sepolia.etherscan.io";
+
+const ABI = {
+  pool: [
+    "function lossRatioWad() view returns (uint256)",
+    "function solvencyRatioWad() view returns (uint256)",
+    "function totalAssets() view returns (uint256)",
+    "function lockedCapital() view returns (uint256)",
+    "function freeCapacity() view returns (uint256)",
+    "function totalPremiumsCollected() view returns (uint256)",
+    "function totalClaimsPaid() view returns (uint256)",
+    "function mcr() view returns (uint256)"
+  ],
+  registry: [
+    "function policyCount() view returns (uint256)",
+    "function policyIdAt(uint256) view returns (bytes32)",
+    "function activePolicyCount() view returns (uint256)",
+    "function totalSumInsured() view returns (uint256)",
+    "function getPolicy(bytes32) view returns (tuple(bytes32 loanId,uint256 sumInsured,uint256 premiumRateWad,uint64 waitingPeriodEnd,uint64 lastAccrualAt,uint256 premiumsAccrued,uint256 premiumsCollected,uint8 ageBand,uint8 sex,uint8 status))"
+  ],
+  mirror: [
+    "event LoanMirrored(bytes32 indexed loanId, bytes32 indexed borrowerCommitment, address lender, uint256 principal, bytes32 queryId)",
+    "event OutstandingUpdated(bytes32 indexed loanId, uint256 amount, uint256 outstanding, bytes32 queryId)",
+    "function totalOutstanding() view returns (uint256)"
+  ],
+  claims: [
+    "function challengeWindow() view returns (uint64)",
+    "event ClaimSettled(bytes32 indexed loanId, address indexed lender, uint256 payout, uint256 sumInsured)"
+  ]
+};
+
+const STATUS = ["None", "Pending", "Active", "Claimed", "Lapsed"];
+const WAD = 10n ** 18n;
+
+const pct = (wad) => (Number(wad) / 1e18 * 100).toFixed(1) + "%";
+const ratio = (wad) => (Number(wad) / 1e18).toFixed(2) + "×";
+const usd = (v) => {
+  const n = Number(ethers.formatUnits(v, 6));
+  return n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+};
+const short = (h) => h.slice(0, 10) + "…" + h.slice(-6);
+const el = (id) => document.getElementById(id);
+
+async function boot() {
+  let deployment;
+  try {
+    const res = await fetch("../deployments/creditcoin.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("not deployed");
+    deployment = await res.json();
+  } catch {
+    el("net-status").textContent = "not deployed";
+    el("net-dot").className = "dot down";
+    el("policies-empty").hidden = false;
+    el("feed-empty").hidden = false;
+    el("policies-empty").innerHTML =
+      "<strong>Not deployed yet.</strong> Run <code>npm run deploy:creditcoin</code>, then reload. " +
+      "This page reads <code>deployments/creditcoin.json</code>.";
+    return;
+  }
+
+  const provider = new ethers.JsonRpcProvider(RPC);
+
+  try {
+    const block = await provider.getBlockNumber();
+    el("net-status").textContent = "connected";
+    el("net-dot").className = "dot live";
+    el("net-block").textContent = "block " + block.toLocaleString("en-US");
+  } catch {
+    el("net-status").textContent = "rpc unreachable";
+    el("net-dot").className = "dot down";
+    return;
+  }
+
+  const pool = new ethers.Contract(deployment.capitalPool, ABI.pool, provider);
+  const registry = new ethers.Contract(deployment.policyRegistry, ABI.registry, provider);
+  const mirror = new ethers.Contract(deployment.loanMirror, ABI.mirror, provider);
+  const claims = new ethers.Contract(deployment.claimEngine, ABI.claims, provider);
+
+  await Promise.all([
+    renderTrust(pool, registry, mirror),
+    renderChallengeWindow(claims),
+    renderPolicies(registry),
+    renderFeed(provider, mirror, claims)
+  ]);
+}
+
+async function renderTrust(pool, registry, mirror) {
+  const [loss, solv, assets, locked, free, premiums, claimsPaid, mcr, active, insured] =
+    await Promise.all([
+      pool.lossRatioWad(), pool.solvencyRatioWad(), pool.totalAssets(),
+      pool.lockedCapital(), pool.freeCapacity(), pool.totalPremiumsCollected(),
+      pool.totalClaimsPaid(), pool.mcr(), registry.activePolicyCount(),
+      registry.totalSumInsured()
+    ]);
+
+  el("loss-ratio").textContent = premiums === 0n ? "n/a" : pct(loss);
+  el("solvency").textContent = mcr === 0n ? "∞" : ratio(solv);
+  el("mcr-note").textContent = "MCR " + usd(mcr) + " · assets " + usd(assets);
+  el("reserves").textContent = usd(assets);
+  el("capacity-note").textContent = usd(free) + " free · " + usd(locked) + " locked";
+  el("insured").textContent = usd(insured);
+  el("policy-note").textContent =
+    active + " active " + (active === 1n ? "policy" : "policies") +
+    " · premium " + usd(premiums) + " · claims " + usd(claimsPaid);
+}
+
+async function renderChallengeWindow(claims) {
+  try {
+    const w = Number(await claims.challengeWindow());
+    if (w < 24 * 3600) {
+      el("cw-value").textContent = w < 120 ? w + " seconds" : Math.round(w / 60) + " minutes";
+      el("demo-banner").hidden = false;
+    }
+  } catch { /* contract may predate the getter; banner simply stays hidden */ }
+}
+
+async function renderPolicies(registry) {
+  const count = Number(await registry.policyCount());
+  if (count === 0) { el("policies-empty").hidden = false; return; }
+
+  const rows = [];
+  for (let i = 0; i < count; i++) {
+    const id = await registry.policyIdAt(i);
+    const p = await registry.getPolicy(id);
+    rows.push(
+      "<tr>" +
+      '<td class="mono">' + short(id) + "</td>" +
+      "<td>" + (18 + Number(p.ageBand) * 5) + "–" + (23 + Number(p.ageBand) * 5) + "</td>" +
+      "<td>" + (Number(p.sex) === 0 ? "F" : "M") + "</td>" +
+      '<td class="num">' + usd(p.sumInsured) + "</td>" +
+      '<td class="num">' + usd(p.premiumsAccrued) + "</td>" +
+      '<td><span class="pill ' + (Number(p.status) === 2 ? "active" : "claimed") + '">' +
+        STATUS[Number(p.status)] + "</span></td>" +
+      "</tr>"
+    );
+  }
+  el("policies-body").innerHTML = rows.join("");
+  el("policies-table").hidden = false;
+}
+
+async function renderFeed(provider, mirror, claims) {
+  const head = await provider.getBlockNumber();
+  const from = Math.max(0, head - 200000);
+
+  const [mirrored, updated, settled] = await Promise.all([
+    mirror.queryFilter(mirror.filters.LoanMirrored(), from, head).catch(() => []),
+    mirror.queryFilter(mirror.filters.OutstandingUpdated(), from, head).catch(() => []),
+    claims.queryFilter(claims.filters.ClaimSettled(), from, head).catch(() => [])
+  ]);
+
+  const items = [
+    ...mirrored.map((e) => ({ ev: "LoanDisbursed", detail: "verified → loan mirrored", e })),
+    ...updated.map((e) => ({ ev: "RepaymentMade", detail: "verified → balance updated", e })),
+    ...settled.map((e) => ({ ev: "ClaimSettled", detail: "paid to lender", e }))
+  ].sort((a, b) => b.e.blockNumber - a.e.blockNumber).slice(0, 12);
+
+  if (items.length === 0) { el("feed-empty").hidden = false; return; }
+
+  el("feed").innerHTML = items.map((it) =>
+    '<div class="feed-item">' +
+      '<div><div class="ev">' + it.ev + "</div>" +
+      '<div class="chain-pair">block ' + it.e.blockNumber.toLocaleString("en-US") + "</div></div>" +
+      '<div class="chain-pair">Ethereum Sepolia <span class="arrow">→</span> Creditcoin CC3 · ' +
+        it.detail + "</div>" +
+      '<div class="mono"><a href="' + EXPLORER_CC + "/tx/" + it.e.transactionHash +
+        '" target="_blank" rel="noopener">' + short(it.e.transactionHash) + "</a></div>" +
+    "</div>"
+  ).join("");
+}
+
+boot().catch((err) => {
+  el("net-status").textContent = "error";
+  el("net-dot").className = "dot down";
+  console.error(err);
+});
+</script>
+</body>
+</html>
