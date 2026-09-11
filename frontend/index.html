@@ -68,6 +68,8 @@
     font-variant-numeric: tabular-nums;
   }
   .metric.hero .v { font-size: 68px; color: var(--green); }
+  .metric.hero .v.warn { color: var(--amber); }
+  .metric.hero .v.bad  { color: var(--red); }
   .metric .note { font-size: 13px; color: var(--muted); margin-top: 12px; line-height: 1.4; }
   .metric .bench {
     display: inline-block; margin-top: 12px; padding: 4px 10px;
@@ -162,7 +164,7 @@
       <div class="net">
         <span><span class="dot" id="net-dot"></span><span id="net-status">connecting…</span></span>
         <span id="net-block">block —</span>
-        <span>CC3 Testnet · 102031</span>
+        <span id="net-name">CC3 Testnet · 102031</span>
       </div>
     </div>
   </header>
@@ -179,6 +181,7 @@
       <div class="k">Loss ratio</div>
       <div class="v" id="loss-ratio">—</div>
       <div class="bench">Brazilian market benchmark ~18%</div>
+      <div class="note" id="loss-note"></div>
     </div>
     <div class="metric">
       <div class="k">Solvency vs MCR</div>
@@ -212,7 +215,7 @@
       <thead>
         <tr>
           <th>Loan</th><th>Age band</th><th>Sex</th>
-          <th class="num">Sum insured</th><th class="num">Premium accrued</th><th>Status</th>
+          <th class="num">Sum insured</th><th class="num">Premium collected</th><th>Status</th>
         </tr>
       </thead>
       <tbody id="policies-body"></tbody>
@@ -246,7 +249,11 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
 <script>
-const RPC = "https://rpc.cc3-testnet.creditcoin.network";
+// ?net=local points the dashboard at a local hardhat node running scripts/demo.local.ts.
+// Default is CC3 Testnet.
+const LOCAL = new URLSearchParams(location.search).get("net") === "local";
+const RPC = LOCAL ? "http://127.0.0.1:8545" : "https://rpc.cc3-testnet.creditcoin.network";
+const DEPLOYMENT_FILE = LOCAL ? "../deployments/localhost.json" : "../deployments/creditcoin.json";
 const EXPLORER_CC = "https://creditcoin-testnet.blockscout.com";
 const EXPLORER_ETH = "https://sepolia.etherscan.io";
 
@@ -294,7 +301,7 @@ const el = (id) => document.getElementById(id);
 async function boot() {
   let deployment;
   try {
-    const res = await fetch("../deployments/creditcoin.json", { cache: "no-store" });
+    const res = await fetch(DEPLOYMENT_FILE, { cache: "no-store" });
     if (!res.ok) throw new Error("not deployed");
     deployment = await res.json();
   } catch {
@@ -315,6 +322,7 @@ async function boot() {
     el("net-status").textContent = "connected";
     el("net-dot").className = "dot live";
     el("net-block").textContent = "block " + block.toLocaleString("en-US");
+    if (LOCAL) el("net-name").textContent = "Local hardhat node · demo run";
   } catch {
     el("net-status").textContent = "rpc unreachable";
     el("net-dot").className = "dot down";
@@ -343,7 +351,19 @@ async function renderTrust(pool, registry, mirror) {
       registry.totalSumInsured()
     ]);
 
-  el("loss-ratio").textContent = premiums === 0n ? "n/a" : pct(loss);
+  const ratioPct = premiums === 0n ? null : Number(loss) / 1e18 * 100;
+  el("loss-ratio").textContent = ratioPct === null ? "n/a" : pct(loss);
+  el("loss-ratio").className = "v" +
+    (ratioPct === null ? "" : ratioPct > 100 ? " bad" : ratioPct > 50 ? " warn" : "");
+
+  // A ratio computed from a handful of policies is a demonstration of the mechanism, not a
+  // market-comparable figure. Say so rather than letting the number stand on its own.
+  const n = Number(active) + (Number(claimsPaid) > 0 ? 1 : 0);
+  if (ratioPct !== null && n < 100) {
+    el("loss-note").textContent =
+      "Demo book of " + n + " policies. A real book prices for roughly one death per thousand " +
+      "policy-years, so this is the mechanism working, not a comparable rate.";
+  }
   el("solvency").textContent = mcr === 0n ? "∞" : ratio(solv);
   el("mcr-note").textContent = "MCR " + usd(mcr) + " · assets " + usd(assets);
   el("reserves").textContent = usd(assets);
@@ -378,7 +398,7 @@ async function renderPolicies(registry) {
       "<td>" + (18 + Number(p.ageBand) * 5) + "–" + (23 + Number(p.ageBand) * 5) + "</td>" +
       "<td>" + (Number(p.sex) === 0 ? "F" : "M") + "</td>" +
       '<td class="num">' + usd(p.sumInsured) + "</td>" +
-      '<td class="num">' + usd(p.premiumsAccrued) + "</td>" +
+      '<td class="num">' + usd(p.premiumsCollected) + "</td>" +
       '<td><span class="pill ' + (Number(p.status) === 2 ? "active" : "claimed") + '">' +
         STATUS[Number(p.status)] + "</span></td>" +
       "</tr>"
@@ -390,7 +410,7 @@ async function renderPolicies(registry) {
 
 async function renderFeed(provider, mirror, claims) {
   const head = await provider.getBlockNumber();
-  const from = Math.max(0, head - 200000);
+  const from = Math.max(0, head - (LOCAL ? head : 200000));
 
   const [mirrored, updated, settled] = await Promise.all([
     mirror.queryFilter(mirror.filters.LoanMirrored(), from, head).catch(() => []),
@@ -412,8 +432,10 @@ async function renderFeed(provider, mirror, claims) {
       '<div class="chain-pair">block ' + it.e.blockNumber.toLocaleString("en-US") + "</div></div>" +
       '<div class="chain-pair">Ethereum Sepolia <span class="arrow">→</span> Creditcoin CC3 · ' +
         it.detail + "</div>" +
-      '<div class="mono"><a href="' + EXPLORER_CC + "/tx/" + it.e.transactionHash +
-        '" target="_blank" rel="noopener">' + short(it.e.transactionHash) + "</a></div>" +
+      '<div class="mono">' + (LOCAL
+        ? short(it.e.transactionHash)
+        : '<a href="' + EXPLORER_CC + "/tx/" + it.e.transactionHash +
+          '" target="_blank" rel="noopener">' + short(it.e.transactionHash) + "</a>") + "</div>" +
     "</div>"
   ).join("");
 }

@@ -119,6 +119,26 @@ npm run build
 npm test        # 79 tests, no network required
 ```
 
+### See the whole thing run, with no testnet funds
+
+```bash
+npx hardhat node                                          # terminal 1
+npx hardhat run scripts/demo.local.ts --network localhost # terminal 2
+```
+
+Runs the complete cycle in about two seconds: originate, verify, five rejected attacks,
+underwrite, repay, re-verify, a book of proved premium payments, two death attestations, the
+challenge window, settlement to the lender, and a claim paid while the pool sits below its MCR.
+
+Everything is real except the `0xFD2` precompile itself, which is native runtime code and cannot
+exist on a Hardhat node; mock bytecode is installed at the real address. The contracts are
+identical to the ones deployed on testnet.
+
+Then serve the dashboard from the repository root and open
+`http://localhost:8080/frontend/index.html?net=local`.
+
+Full walkthrough including faucets: [`docs/PASO-A-PASO.md`](docs/PASO-A-PASO.md).
+
 Confirm the live protocol surface — no funds needed, read-only:
 
 ```bash
