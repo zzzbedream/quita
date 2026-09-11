@@ -16,3 +16,4 @@ worker/data/
 .DS_Store
 frontend/node_modules/
 frontend/dist/
+deployments/localhost.json
