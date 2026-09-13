@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0e17'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='21' font-weight='700' fill='%2306d6a0' text-anchor='middle'%3EQ%3C/text%3E%3C/svg%3E" />
+<title>Quita — On-Chain Credit Life Insurance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root {
+    --bg:        #0a0e17;
+    --bg-2:      #111827;
+    --bg-3:      #1a2235;
+    --surface:   #1e293b;
+    --border:    #2a3a52;
+    --border-hi: #3b5278;
+    --text:      #e2e8f0;
+    --text-2:    #94a3b8;
+    --text-3:    #64748b;
+    --cyan:      #06d6a0;
+    --cyan-dim:  rgba(6,214,160,.12);
+    --cyan-glow: rgba(6,214,160,.25);
+    --blue:      #3b82f6;
+    --blue-dim:  rgba(59,130,246,.10);
+    --amber:     #f59e0b;
+    --amber-dim: rgba(245,158,11,.10);
+    --red:       #ef4444;
+    --red-dim:   rgba(239,68,68,.08);
+    --mono:      'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
+    --sans:      'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---- nav ---- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,14,23,.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  nav .brand {
+    font-size: 22px; font-weight: 800; letter-spacing: -.03em;
+    color: var(--text);
+  }
+  nav .brand span { color: var(--cyan); }
+  nav .links { display: flex; gap: 32px; align-items: center; }
+  nav .links a {
+    color: var(--text-2); text-decoration: none; font-size: 14px;
+    font-weight: 500; letter-spacing: .01em;
+    transition: color .2s;
+  }
+  nav .links a:hover { color: var(--cyan); }
+  .btn-launch {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--cyan); color: var(--bg); font-weight: 700;
+    font-size: 14px; padding: 10px 22px; border-radius: 8px;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: background .2s, transform .15s;
+  }
+  .btn-launch:hover { background: #05c494; transform: translateY(-1px); }
+  .btn-launch svg { width: 16px; height: 16px; }
+
+  /* ---- hero ---- */
+  .hero {
+    padding: 160px 0 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 65%);
+    pointer-events: none; opacity: .35;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: .12;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 100%);
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--cyan-dim); border: 1px solid rgba(6,214,160,.2);
+    border-radius: 999px; padding: 6px 16px;
+    font-size: 12px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--cyan);
+    margin-bottom: 28px;
+  }
+  .hero-badge .pulse {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--cyan);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--cyan-glow); }
+    50% { opacity: .7; box-shadow: 0 0 0 6px transparent; }
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -.035em;
+    max-width: 800px;
+    margin-bottom: 24px;
+  }
+  .hero h1 .hl { color: var(--cyan); }
+  .hero .sub {
+    font-size: 20px; color: var(--text-2);
+    max-width: 600px; line-height: 1.6;
+    margin-bottom: 40px;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: var(--text);
+    font-weight: 600; font-size: 14px;
+    padding: 10px 22px; border-radius: 8px;
+    border: 1px solid var(--border-hi);
+    text-decoration: none; cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .btn-ghost:hover { border-color: var(--cyan); background: var(--cyan-dim); }
+
+  /* ---- stats ribbon ---- */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; margin-bottom: 120px;
+  }
+  .stat {
+    background: var(--bg-2); padding: 28px 24px;
+    text-align: center;
+  }
+  .stat .val {
+    font-size: 36px; font-weight: 800;
+    font-family: var(--mono); letter-spacing: -.02em;
+    color: var(--cyan); margin-bottom: 4px;
+  }
+  .stat .lbl {
+    font-size: 12px; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .1em; font-weight: 600;
+  }
+
+  /* ---- section headers ---- */
+  .section-tag {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--cyan); letter-spacing: .12em;
+    text-transform: uppercase; font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800; letter-spacing: -.03em;
+    line-height: 1.15; margin-bottom: 20px;
+  }
+  .section-desc {
+    font-size: 17px; color: var(--text-2);
+    max-width: 640px; line-height: 1.7;
+  }
+
+  /* ---- problem section ---- */
+  .problem { padding: 0 0 120px; }
+  .problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; margin-top: 48px; align-items: start;
+  }
+  .problem-card {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px;
+  }
+  .problem-card .icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 18px;
+  }
+  .problem-card h3 {
+    font-size: 18px; font-weight: 700; margin-bottom: 10px;
+  }
+  .problem-card p { font-size: 15px; color: var(--text-2); line-height: 1.65; }
+  .ic-red { background: var(--red-dim); color: var(--red); }
+  .ic-amber { background: var(--amber-dim); color: var(--amber); }
+  .ic-blue { background: var(--blue-dim); color: var(--blue); }
+  .ic-cyan { background: var(--cyan-dim); color: var(--cyan); }
+
+  /* ---- how it works ---- */
+  .how { padding: 0 0 120px; }
+  .arch-flow {
+    display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 0; align-items: center;
+    margin-top: 48px;
+  }
+  .chain-box {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px; position: relative;
+  }
+  .chain-box .chain-label {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text-3); text-transform: uppercase;
+    letter-spacing: .1em; margin-bottom: 14px;
+  }
+  .chain-box .chain-name {
+    font-size: 20px; font-weight: 700; margin-bottom: 6px;
+  }
+  .chain-box .chain-desc {
+    font-size: 14px; color: var(--text-2); line-height: 1.5;
+  }
+  .chain-box .chain-contracts {
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .chain-box .ct {
+    font-family: var(--mono); font-size: 12px; color: var(--cyan);
+    padding: 3px 0;
+  }
+  .flow-arrow {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; padding: 0 12px;
+  }
+  .flow-arrow .line {
+    width: 48px; height: 2px;
+    background: linear-gradient(90deg, var(--border-hi), var(--cyan));
+  }
+  .flow-arrow .label {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text-3); text-transform: uppercase;
+    letter-spacing: .08em; white-space: nowrap;
+  }
+
+  /* ---- verified vs trusted ---- */
+  .trust-section { padding: 0 0 120px; }
+  .trust-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 24px; margin-top: 48px;
+  }
+  .trust-card {
+    border-radius: 14px; padding: 36px;
+    position: relative; overflow: hidden;
+  }
+  .trust-card::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+  }
+  .trust-verified {
+    background: var(--bg-2); border: 1px solid rgba(6,214,160,.2);
+  }
+  .trust-verified::before { background: var(--cyan); }
+  .trust-trusted {
+    background: var(--bg-2); border: 1px solid rgba(245,158,11,.2);
+  }
+  .trust-trusted::before { background: var(--amber); }
+  .trust-card h3 {
+    font-family: var(--mono); font-size: 13px;
+    letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 700; margin-bottom: 18px;
+  }
+  .trust-verified h3 { color: var(--cyan); }
+  .trust-trusted h3 { color: var(--amber); }
+  .trust-card ul {
+    list-style: none; padding: 0;
+  }
+  .trust-card li {
+    font-size: 14px; color: var(--text-2); padding: 6px 0;
+    padding-left: 20px; position: relative;
+  }
+  .trust-card li::before {
+    content: ''; position: absolute; left: 0; top: 13px;
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .trust-verified li::before { background: var(--cyan); }
+  .trust-trusted li::before { background: var(--amber); }
+
+  /* ---- code snippet ---- */
+  .code-section { padding: 0 0 120px; }
+  .code-block {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; margin-top: 48px;
+  }
+  .code-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 13px; color: var(--text-3);
+  }
+  .code-header .dots {
+    display: flex; gap: 6px; margin-right: 8px;
+  }
+  .code-header .dots span {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--border-hi);
+  }
+  pre {
+    padding: 24px; overflow-x: auto;
+    font-family: var(--mono); font-size: 14px;
+    line-height: 1.7; color: var(--text-2);
+  }
+  pre .kw { color: #c084fc; }
+  pre .fn { color: #60a5fa; }
+  pre .cm { color: var(--text-3); font-style: italic; }
+  pre .str { color: var(--cyan); }
+  pre .num { color: #f59e0b; }
+  pre .op { color: var(--text); }
+
+  /* ---- events table ---- */
+  .events-section { padding: 0 0 120px; }
+  .ev-table {
+    width: 100%; border-collapse: collapse;
+    margin-top: 48px;
+  }
+  .ev-table th {
+    text-align: left; font-family: var(--mono);
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); padding: 0 16px 14px 0; font-weight: 600;
+  }
+  .ev-table td {
+    padding: 16px 16px 16px 0;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .ev-table .ev-name {
+    font-family: var(--mono); font-weight: 600; color: var(--cyan);
+  }
+  .ev-table .ev-consumer { color: var(--text-2); }
+  .ev-table .ev-effect { color: var(--text-2); }
+
+  /* ---- CTA ---- */
+  .cta {
+    text-align: center; padding: 100px 0 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta::before {
+    content: ''; position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 65%);
+    pointer-events: none; opacity: .2;
+  }
+  .cta .section-title { max-width: 600px; margin: 0 auto 16px; }
+  .cta .section-desc { max-width: 500px; margin: 0 auto 40px; }
+  .cta .wrap { position: relative; z-index: 1; }
+
+  /* ---- footer ---- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+  }
+  footer .inner {
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 16px;
+  }
+  footer .copy {
+    font-size: 13px; color: var(--text-3);
+  }
+  footer .footer-links { display: flex; gap: 24px; }
+  footer .footer-links a {
+    font-size: 13px; color: var(--text-3); text-decoration: none;
+    transition: color .2s;
+  }
+  footer .footer-links a:hover { color: var(--cyan); }
+  footer .built {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text-3); letter-spacing: .05em;
+  }
+
+  /* ---- responsive ---- */
+  @media (max-width: 900px) {
+    .problem-grid { grid-template-columns: 1fr; }
+    .arch-flow {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .flow-arrow { transform: rotate(90deg); padding: 8px 0; }
+    .flow-arrow .line { width: 32px; }
+    .trust-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    nav .links a:not(.btn-launch) { display: none; }
+  }
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: 1fr; }
+    .hero { padding: 120px 0 60px; }
+  }
+  /* ---- source note + declared limitations ---- */
+  .source-note {
+    margin-top: 28px; padding: 14px 18px;
+    background: var(--bg-2); border-left: 3px solid var(--amber);
+    border-radius: 0 8px 8px 0;
+    font-size: 13px; line-height: 1.6; color: var(--text-2);
+  }
+  .source-note strong { color: var(--amber); font-weight: 600; }
+
+  .limits { padding: 96px 0; border-top: 1px solid var(--border); }
+  .limits-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px; margin-top: 40px;
+  }
+  .limit-card {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 24px;
+  }
+  .limit-card h3 {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 8px; letter-spacing: -.01em;
+  }
+  .limit-card p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+  .limit-card .tag {
+    display: inline-block; margin-bottom: 12px; padding: 3px 10px;
+    border-radius: 999px; font-family: var(--mono);
+    font-size: 11px; font-weight: 500; letter-spacing: .04em;
+    background: var(--amber-dim); color: var(--amber);
+  }
+  /* ---- responsive containment ---- */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-scroll .ev-table { min-width: 520px; }
+  .code-block pre { overflow-x: auto; }
+
+  @media (max-width: 700px) {
+    .wrap { padding: 0 20px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .arch-flow { grid-template-columns: 1fr; }
+    .flow-arrow { transform: rotate(90deg); margin: 4px auto; }
+    .trust-grid, .problem-grid, .limits-grid { grid-template-columns: 1fr; }
+    .hero-actions { flex-wrap: wrap; }
+    nav .links a:not(.btn-launch) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="inner">
+    <div class="brand">Quita<span>.</span></div>
+    <div class="links">
+      <a href="#problem">Problem</a>
+      <a href="#how">Architecture</a>
+      <a href="#trust">Trust Model</a>
+      <a href="#limits">Limitations</a>
+      <a href="frontend/index.html" class="btn-launch">
+        Launch App
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 8h10M9 4l4 4-4 4"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="hero-badge">
+      <span class="pulse"></span>
+      Built on Attestcoin Protocol
+    </div>
+    <h1>Credit life insurance with a <span class="hl">verifiable</span> loss ratio</h1>
+    <p class="sub">
+      The insured balance, premiums, and claims are on-chain counters driven by
+      cryptographically proved Ethereum events. The loss ratio is a computation
+      anyone can read, not a disclosure you have to believe.
+    </p>
+    <div class="hero-actions">
+      <a href="frontend/index.html" class="btn-launch">
+        Open Dashboard
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 8h10M9 4l4 4-4 4"/>
+        </svg>
+      </a>
+      <a href="#how" class="btn-ghost">See How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="wrap">
+  <div class="stats">
+    <div class="stat">
+      <div class="val">6</div>
+      <div class="lbl">Smart Contracts</div>
+    </div>
+    <div class="stat">
+      <div class="val">4</div>
+      <div class="lbl">Verified Events</div>
+    </div>
+    <div class="stat">
+      <div class="val">2</div>
+      <div class="lbl">Chains Bridged</div>
+    </div>
+    <div class="stat">
+      <div class="val">0</div>
+      <div class="lbl">Trusted Amounts</div>
+    </div>
+  </div>
+</div>
+
+<!-- Problem -->
+<section class="problem" id="problem">
+  <div class="wrap">
+    <div class="section-tag">// the problem</div>
+    <h2 class="section-title">Credit life insurance is a black box</h2>
+    <p class="section-desc">
+      In Latin America, credit life cover is compulsory for most consumer lending.
+      The market is profitable, opaque, and the subject of sustained litigation.
+    </p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon ic-red">&#x26A0;</div>
+        <h3>Opaque Loss Ratios</h3>
+        <p>
+          A loss ratio is a disclosure about numbers nobody else can see. Whatever
+          figure the insurer reports, there is no way for the borrower, the regulator,
+          or the market to independently verify it.
+        </p>
+      </div>
+      <div class="problem-card">
+        <div class="icon ic-amber">&#x1F4B0;</div>
+        <h3>Commission Capture</h3>
+        <p>
+          Litigation analysis puts distribution commission as high as 87% of
+          premium. The borrower pays for cover, but on those figures most of the
+          premium never reaches the risk pool.
+        </p>
+      </div>
+      <div class="problem-card">
+        <div class="icon ic-blue">&#x1F512;</div>
+        <h3>Tied Policies</h3>
+        <p>
+          The policy is tied to the loan. The borrower cannot choose a carrier,
+          compare prices, or verify that the cover matches the outstanding debt.
+          This has been litigated extensively in Brazil.
+        </p>
+      </div>
+      <div class="problem-card">
+        <div class="icon ic-cyan">&#x2699;</div>
+        <h3>Quita's Approach</h3>
+        <p>
+          Replace trust with math. Reconstruct the insured balance from Ethereum
+          events proved on Creditcoin. Make every premium and every claim a
+          verifiable on-chain counter. Loss ratio becomes a view function.
+        </p>
+      </div>
+    </div>
+    <p class="source-note">
+      <strong>On the figures above:</strong> market numbers cited here come from analysis of the
+      Tema&nbsp;972 litigation and industry commentary, and are <em>pending cross-check against
+      public SUSEP statistics</em>. They are presented as an order of magnitude, not as audited
+      data. Nothing in Quita depends on them being exact &mdash; the point is that today they
+      cannot be checked at all.
+    </p>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="section-tag">// architecture</div>
+    <h2 class="section-title">Two chains, one verifiable book</h2>
+    <p class="section-desc">
+      Loan events originate on Ethereum. Insurance logic runs on Creditcoin.
+      The Attestcoin BlockProver precompile bridges them trustlessly&mdash;no oracle,
+      no multisig, just Merkle inclusion verified inside the transaction.
+    </p>
+    <div class="arch-flow">
+      <!-- Sepolia -->
+      <div class="chain-box">
+        <div class="chain-label">Source Chain</div>
+        <div class="chain-name">Ethereum Sepolia</div>
+        <div class="chain-desc">
+          Emits loan events. Carries the accounting for
+          <code>outstandingAfter</code> so balances cannot be asserted.
+        </div>
+        <div class="chain-contracts">
+          <div class="ct">QuitaOrigin.sol</div>
+        </div>
+      </div>
+      <!-- Arrow 1 -->
+      <div class="flow-arrow">
+        <div class="label">Merkle proof</div>
+        <div class="line"></div>
+        <div class="label">0xFD2 verifies</div>
+      </div>
+      <!-- Creditcoin -->
+      <div class="chain-box">
+        <div class="chain-label">Execution Chain</div>
+        <div class="chain-name">Creditcoin CC3</div>
+        <div class="chain-desc">
+          All insurance logic. Proofs verified synchronously by the
+          BlockProver precompile at address <code>0x0FD2</code>.
+        </div>
+        <div class="chain-contracts">
+          <div class="ct">LoanMirror.sol</div>
+          <div class="ct">PolicyRegistry.sol</div>
+          <div class="ct">CapitalPool.sol</div>
+          <div class="ct">ClaimEngine.sol</div>
+        </div>
+      </div>
+      <!-- Arrow 2 -->
+      <div class="flow-arrow">
+        <div class="label">Reads state</div>
+        <div class="line"></div>
+        <div class="label">Dashboard</div>
+      </div>
+      <!-- Dashboard -->
+      <div class="chain-box">
+        <div class="chain-label">Frontend</div>
+        <div class="chain-name">Live Dashboard</div>
+        <div class="chain-desc">
+          Read-only view of loss ratio, solvency, reserves, and
+          the Attestcoin verification feed. All data from chain.
+        </div>
+        <div class="chain-contracts">
+          <div class="ct">lossRatioWad()</div>
+          <div class="ct">solvencyRatioWad()</div>
+          <div class="ct">totalSumInsured()</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Events -->
+<section class="events-section">
+  <div class="wrap">
+    <div class="section-tag">// event pipeline</div>
+    <h2 class="section-title">Four events, fully verified</h2>
+    <p class="section-desc">
+      Every event emitted on Sepolia is proved on Creditcoin via the Attestcoin
+      protocol. Receipt status, emitter address, and replay protection are all
+      checked on-chain.
+    </p>
+    <div class="table-scroll">
+    <table class="ev-table">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Consumer</th>
+          <th>On-Chain Effect</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="ev-name">LoanDisbursed</td>
+          <td class="ev-consumer">LoanMirror</td>
+          <td class="ev-effect">Creates the mirrored loan with verified principal</td>
+        </tr>
+        <tr>
+          <td class="ev-name">RepaymentMade</td>
+          <td class="ev-consumer">LoanMirror</td>
+          <td class="ev-effect">Updates outstanding balance from <code style="color:var(--cyan)">outstandingAfter</code></td>
+        </tr>
+        <tr>
+          <td class="ev-name">PremiumPaid</td>
+          <td class="ev-consumer">PolicyRegistry</td>
+          <td class="ev-effect">Credits premium to the capital pool</td>
+        </tr>
+        <tr>
+          <td class="ev-name">DeathAttested</td>
+          <td class="ev-consumer">ClaimEngine</td>
+          <td class="ev-effect">Counts toward 2-of-3 attestor threshold</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- Code -->
+<section class="code-section">
+  <div class="wrap">
+    <div class="section-tag">// the key invariant</div>
+    <h2 class="section-title">The payout is never trusted</h2>
+    <p class="section-desc">
+      An attestor who lies about the amount changes nothing. The claim payout is
+      always the minimum of the sum insured and the cryptographically verified
+      outstanding balance.
+    </p>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><span></span><span></span><span></span></div>
+        ClaimEngine.sol
+      </div>
+<pre><span class="cm">// The financially consequential quantity is never read from the attestation.</span>
+<span class="cm">// An attestor who lies about the amount changes nothing.</span>
+
+<span class="kw">uint256</span> outstanding <span class="op">=</span> loanMirror.<span class="fn">outstanding</span>(loanId);
+<span class="kw">uint256</span> payout <span class="op">=</span> <span class="fn">Math.min</span>(policy.sumInsured, outstanding);
+
+pool.<span class="fn">transferSettlement</span>(policy.lender, payout);
+
+<span class="kw">emit</span> <span class="fn">ClaimSettled</span>(loanId, policy.lender, payout, policy.sumInsured);</pre>
+    </div>
+  </div>
+</section>
+
+<!-- Trust model -->
+<section class="trust-section" id="trust">
+  <div class="wrap">
+    <div class="section-tag">// trust model</div>
+    <h2 class="section-title">Verified vs trusted</h2>
+    <p class="section-desc">
+      Quita is honest about what it can prove and what it cannot.
+      The financial quantities are cryptographically verified.
+      The real-world fact of death is trusted, with mitigations.
+    </p>
+    <div class="trust-grid">
+      <div class="trust-card trust-verified">
+        <h3>Cryptographically Verified</h3>
+        <ul>
+          <li>The loan exists and its principal</li>
+          <li>Every repayment and the outstanding balance</li>
+          <li>Premium collected by the pool</li>
+          <li>That the source transaction succeeded</li>
+          <li>That the log came from QuitaOrigin</li>
+          <li>That the proof is not a replay</li>
+          <li>The claim payout amount</li>
+        </ul>
+      </div>
+      <div class="trust-card trust-trusted">
+        <h3>Trusted with Mitigations</h3>
+        <ul>
+          <li>That the borrower actually died</li>
+          <li>Mitigated by 2-of-3 attestor threshold</li>
+          <li>Challenge window before settlement &mdash; 24h default, shortened for demo</li>
+          <li>Attestor bonds and slashing on roadmap</li>
+          <li>Death is a world-fact no protocol can verify</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Declared limitations -->
+<section class="limits" id="limits">
+  <div class="wrap">
+    <div class="section-tag">// declared limitations</div>
+    <h2 class="section-title">What this is not</h2>
+    <p class="section-desc">
+      Stated here rather than left to be discovered. Each limitation we declare ourselves is
+      worth more than the same one found by a reviewer.
+    </p>
+    <div class="limits-grid">
+      <div class="limit-card">
+        <div class="tag">trusted input</div>
+        <h3>Death attestation is trusted</h3>
+        <p>
+          Mitigated by a 2-of-3 threshold and a challenge window, not eliminated. Attestor
+          bonds and slashing are roadmap, not implemented.
+        </p>
+      </div>
+      <div class="limit-card">
+        <div class="tag">mock asset</div>
+        <h3>The stablecoin is a mock</h3>
+        <p>
+          <code>MockStable</code> is a freely mintable 6-decimal ERC20 standing in for a
+          settlement asset. It has no value.
+        </p>
+      </div>
+      <div class="limit-card">
+        <div class="tag">placeholder</div>
+        <h3>The mortality table is a placeholder</h3>
+        <p>
+          Flat monthly rates by age band and sex, declared in the contract as
+          <code>TABLE_SOURCE = "PLACEHOLDER"</code>. Plausible magnitudes, not actuarial
+          output. Real use requires BR-EMS&nbsp;2021 per SUSEP filing.
+        </p>
+      </div>
+      <div class="limit-card">
+        <div class="tag">not a carrier</div>
+        <h3>We are not the insurer</h3>
+        <p>
+          Quita is infrastructure for lenders and insurers. It holds no licence and does not
+          underwrite.
+        </p>
+      </div>
+      <div class="limit-card">
+        <div class="tag">testnet</div>
+        <h3>Testnet only</h3>
+        <p>
+          Sepolia and Creditcoin CC3 Testnet. Attestcoin Writability (Creditcoin &rarr;
+          Ethereum) is not used: it is still under third-party testing and audit.
+        </p>
+      </div>
+      <div class="limit-card">
+        <div class="tag">simplified</div>
+        <h3>Premium accrual is simplified</h3>
+        <p>
+          Accrual uses a 30-day month and a single portfolio rate within each band, with no
+          extra premiums. Fine-grained pro-rata accrual is roadmap.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="wrap">
+    <div class="section-tag">// explore</div>
+    <h2 class="section-title">See the numbers. Verify them yourself.</h2>
+    <p class="section-desc">
+      The dashboard reads directly from Creditcoin. Every figure is a
+      <code style="color:var(--cyan)">view</code> function over verified state.
+    </p>
+    <div class="hero-actions" style="justify-content: center;">
+      <a href="frontend/index.html" class="btn-launch">
+        Open Dashboard
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 8h10M9 4l4 4-4 4"/>
+        </svg>
+      </a>
+      <a href="https://github.com/zzzbedream/quita" class="btn-ghost" target="_blank" rel="noopener">
+        View Source on GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap">
+    <div class="inner">
+      <div>
+        <div class="copy">Quita &mdash; On-Chain Credit Life Insurance Infrastructure</div>
+        <div class="built">BUIDL CTC 2026 Fall &middot; RWA Track &middot; Powered by Attestcoin Protocol</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/zzzbedream/quita" target="_blank" rel="noopener">GitHub</a>
+        <a href="docs/ATTESTCOIN_INTEGRATION.md">Integration Doc</a>
+        <a href="frontend/index.html">Dashboard</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

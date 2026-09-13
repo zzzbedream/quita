@@ -134,8 +134,29 @@ Everything is real except the `0xFD2` precompile itself, which is native runtime
 exist on a Hardhat node; mock bytecode is installed at the real address. The contracts are
 identical to the ones deployed on testnet.
 
-Then serve the dashboard from the repository root and open
-`http://localhost:8080/frontend/index.html?net=local`.
+Then serve the repository root over HTTP, for example:
+
+```bash
+npx http-server . -p 8080     # or: python -m http.server 8080
+```
+
+- `http://localhost:8080/` — project overview: the problem, the architecture, the trust model
+  and the declared limitations.
+- `http://localhost:8080/frontend/index.html?net=local` — the live dashboard, reading the
+  contracts on the local node.
+
+Both are static files with no build step. The dashboard drops the `?net=local` query to read
+CC3 Testnet instead.
+
+The book renders without a wallet, which is the point of it. Connecting one (MetaMask or any
+EIP-1193 wallet) adds a liquidity-provider panel: mint the demo settlement asset, deposit into
+`CapitalPool`, and watch reserves and the solvency ratio move. The panel offers the write
+surface that is genuinely permissionless and nothing else &mdash; there is no `underwrite`
+button, because a policy can only come into existence through a verified proof, and no
+attestation button, because attestation is restricted to registered attestors. Withdrawals are
+capped by free capacity: capital backing a live policy cannot be redeemed, which the panel
+surfaces as a protocol rule rather than an error. The panel offers to add CC3 Testnet to the
+wallet, since no wallet ships with it configured.
 
 Full walkthrough including faucets: [`docs/PASO-A-PASO.md`](docs/PASO-A-PASO.md).
 
@@ -174,11 +195,18 @@ Populated by the deployment scripts into `deployments/`.
 
 | Contract | Chain | Address |
 |---|---|---|
-| `QuitaOrigin` | Sepolia | _pending deployment_ |
-| `LoanMirror` | CC3 Testnet | _pending deployment_ |
-| `PolicyRegistry` | CC3 Testnet | _pending deployment_ |
-| `CapitalPool` | CC3 Testnet | _pending deployment_ |
-| `ClaimEngine` | CC3 Testnet | _pending deployment_ |
+| `QuitaOrigin` | Sepolia | [`0xc7624150c28bF26cdF920A0715a7c0ba614faE16`](https://sepolia.etherscan.io/address/0xc7624150c28bF26cdF920A0715a7c0ba614faE16) |
+| `LoanMirror` | CC3 Testnet | [`0x60690F414006008984801DBc550C1348B256820f`](https://creditcoin-testnet.blockscout.com/address/0x60690F414006008984801DBc550C1348B256820f) |
+| `PolicyRegistry` | CC3 Testnet | [`0x36A8F3FAaD2CBca570B524f29A0fd4fbc694cb38`](https://creditcoin-testnet.blockscout.com/address/0x36A8F3FAaD2CBca570B524f29A0fd4fbc694cb38) |
+| `CapitalPool` | CC3 Testnet | [`0x333a96748260e55342baA06d4e633757093EFBC4`](https://creditcoin-testnet.blockscout.com/address/0x333a96748260e55342baA06d4e633757093EFBC4) |
+| `ClaimEngine` | CC3 Testnet | [`0x5A2C3e566E5DFBA29059306BB577b292D0F07f3C`](https://creditcoin-testnet.blockscout.com/address/0x5A2C3e566E5DFBA29059306BB577b292D0F07f3C) |
+| `MockStable` | CC3 Testnet | [`0x68Dd244C1C5eB3CA1545764d659cd9c2FAbB193d`](https://creditcoin-testnet.blockscout.com/address/0x68Dd244C1C5eB3CA1545764d659cd9c2FAbB193d) |
+
+Deployed 2026-09-13 from `0x4e5A7B9F7F66c208bDDeD352356B33a3A634AD6D`.
+`LoanMirror` is pinned to source chain key **1** (Ethereum Sepolia) and to the `QuitaOrigin`
+address above as the only accepted log emitter — a proof from any other contract is rejected.
+
+`MockStable` is the declared mock settlement asset. It is freely mintable and has no value.
 
 ## Network reference
 
@@ -204,6 +232,8 @@ leaves audit · disability cover · mainnet.
 ## Repository layout
 
 ```
+index.html               Project overview (static, no build step)
+frontend/index.html      Live dashboard (read-only) + wallet-gated LP panel
 contracts/origin/        QuitaOrigin — Sepolia event source
 contracts/creditcoin/    QuitaConsumer base + the four insurance contracts
 contracts/libs/          WadMath

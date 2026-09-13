@@ -17,3 +17,7 @@ worker/data/
 frontend/node_modules/
 frontend/dist/
 deployments/localhost.json
+
+# local agent / design tooling, not part of the submission
+.claude/
+.stitch/

@@ -3,150 +3,286 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0e17'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='21' font-weight='700' fill='%2306d6a0' text-anchor='middle'%3EQ%3C/text%3E%3C/svg%3E" />
 <title>Quita — Verified Credit Life Book</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
   :root {
-    --paper:   #f7f6f2;
-    --ink:     #12181d;
-    --muted:   #64707c;
-    --line:    #dfe3e8;
-    --card:    #ffffff;
-    --green:   #0b5d3b;
-    --green-s: #e9f2ed;
-    --amber:   #8a4b12;
-    --amber-s: #fbf0e4;
-    --red:     #8c2b20;
+    --bg:        #0a0e17;
+    --bg-2:      #111827;
+    --bg-3:      #1a2235;
+    --border:    #2a3a52;
+    --border-hi: #3b5278;
+    --text:      #e2e8f0;
+    --text-2:    #94a3b8;
+    --text-3:    #64748b;
+    --cyan:      #06d6a0;
+    --cyan-dim:  rgba(6,214,160,.12);
+    --blue:      #3b82f6;
+    --blue-dim:  rgba(59,130,246,.10);
+    --amber:     #f59e0b;
+    --amber-dim: rgba(245,158,11,.10);
+    --red:       #ef4444;
+    --red-dim:   rgba(239,68,68,.10);
+    --mono:      'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
+    --sans:      'Inter', system-ui, -apple-system, sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
     line-height: 1.5;
     padding: 0 0 80px;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
 
   /* ---- masthead ---- */
   header {
-    border-bottom: 2px solid var(--ink);
-    padding: 34px 0 20px;
+    border-bottom: 1px solid var(--border);
+    padding: 30px 0 22px;
     margin-bottom: 40px;
   }
   .masthead { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-  .logo { font-size: 40px; font-weight: 700; letter-spacing: -.03em; }
-  .tagline { font-size: 15px; color: var(--muted); max-width: 460px; }
-  .net {
-    font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--muted); display: flex; gap: 18px; margin-top: 12px; flex-wrap: wrap;
+  .logo {
+    font-size: 34px; font-weight: 800; letter-spacing: -.035em; color: var(--text);
   }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #bbb; display: inline-block; margin-right: 7px; vertical-align: middle; }
-  .dot.live { background: var(--green); }
-  .dot.down { background: var(--red); }
+  .logo .back {
+    font-family: var(--sans); font-size: 13px; font-weight: 500;
+    color: var(--text-3); text-decoration: none; border: 0;
+    margin-left: 16px; letter-spacing: 0; vertical-align: middle;
+    transition: color .2s;
+  }
+  .logo .back:hover { color: var(--cyan); }
+  .tagline { font-size: 15px; color: var(--text-2); max-width: 460px; margin-top: 6px; }
+  .net {
+    font-family: var(--mono);
+    font-size: 12px; letter-spacing: .04em;
+    color: var(--text-2); display: flex; gap: 18px; margin-top: 12px; flex-wrap: wrap;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--text-3);
+    display: inline-block; margin-right: 8px; vertical-align: middle;
+  }
+  .dot.live { background: var(--cyan); box-shadow: 0 0 0 3px var(--cyan-dim); }
+  .dot.down { background: var(--red); box-shadow: 0 0 0 3px var(--red-dim); }
 
   /* ---- trust header: the largest thing on the page ---- */
   .trust {
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr 1fr;
     gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
+    background: var(--border);
+    border: 1px solid var(--border);
     border-radius: 14px;
     overflow: hidden;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
-  .metric { background: var(--card); padding: 28px 26px; }
+  .metric { background: var(--bg-2); padding: 26px 26px; }
+  .metric.hero { background: var(--bg-3); }
   .metric .k {
-    font-size: 12px; letter-spacing: .11em; text-transform: uppercase;
-    color: var(--muted); font-weight: 600; margin-bottom: 14px;
+    font-size: 11px; letter-spacing: .11em; text-transform: uppercase;
+    color: var(--text-3); font-weight: 600; margin-bottom: 14px;
   }
   .metric .v {
-    font-size: 46px; font-weight: 700; letter-spacing: -.03em; line-height: 1;
+    font-family: var(--mono);
+    font-size: 32px; font-weight: 700; letter-spacing: -.035em; line-height: 1.05;
     font-variant-numeric: tabular-nums;
+    color: var(--text);
+    /* A monetary figure must never break across lines mid-digit. */
+    overflow-wrap: normal; word-break: keep-all;
   }
-  .metric.hero .v { font-size: 68px; color: var(--green); }
+  .metric.hero .v { font-size: 60px; color: var(--cyan); }
   .metric.hero .v.warn { color: var(--amber); }
   .metric.hero .v.bad  { color: var(--red); }
-  .metric .note { font-size: 13px; color: var(--muted); margin-top: 12px; line-height: 1.4; }
+  .metric .note { font-size: 13px; color: var(--text-2); margin-top: 12px; line-height: 1.45; }
   .metric .bench {
-    display: inline-block; margin-top: 12px; padding: 4px 10px;
-    background: var(--amber-s); color: var(--amber);
+    display: inline-block; margin-top: 12px; padding: 4px 11px;
+    background: var(--amber-dim); color: var(--amber);
     border-radius: 999px; font-size: 12px; font-weight: 600;
   }
 
   .verified-note {
-    font-size: 13px; color: var(--muted); margin-bottom: 44px; padding-left: 2px;
+    font-size: 13px; color: var(--text-2); margin-bottom: 48px;
+    padding-left: 2px; max-width: 820px; line-height: 1.6;
   }
 
   /* ---- sections ---- */
-  section { margin-bottom: 44px; }
+  section { margin-bottom: 48px; }
   h2 {
-    font-size: 13px; letter-spacing: .13em; text-transform: uppercase;
-    color: var(--muted); font-weight: 650;
-    padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 20px;
+    font-size: 12px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--text-3); font-weight: 650;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
   }
 
   table { width: 100%; border-collapse: collapse; }
   th {
     text-align: left; font-size: 11px; letter-spacing: .09em; text-transform: uppercase;
-    color: var(--muted); font-weight: 650; padding: 0 14px 10px 0;
+    color: var(--text-3); font-weight: 650; padding: 0 14px 12px 0;
   }
   td {
-    padding: 14px 14px 14px 0; border-top: 1px solid var(--line);
-    font-size: 15px; font-variant-numeric: tabular-nums;
+    padding: 14px 14px 14px 0; border-top: 1px solid var(--border);
+    font-size: 15px; font-variant-numeric: tabular-nums; color: var(--text);
   }
-  td.mono, .mono { font-family: "Cascadia Mono", Consolas, monospace; font-size: 13px; }
+  tbody tr:hover td { background: var(--bg-2); }
+  td.mono, .mono { font-family: var(--mono); font-size: 13px; }
   .num { text-align: right; }
 
   .pill {
-    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    display: inline-block; padding: 3px 11px; border-radius: 999px;
     font-size: 12px; font-weight: 650;
   }
-  .pill.active { background: var(--green-s); color: var(--green); }
-  .pill.claimed { background: var(--amber-s); color: var(--amber); }
+  .pill.active { background: var(--cyan-dim); color: var(--cyan); }
+  .pill.claimed { background: var(--amber-dim); color: var(--amber); }
 
-  a { color: var(--green); text-decoration: none; border-bottom: 1px solid rgba(11,93,59,.28); }
-  a:hover { border-bottom-color: var(--green); }
+  a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(6,214,160,.3); }
+  a:hover { border-bottom-color: var(--cyan); }
 
   /* ---- verification feed ---- */
   .feed-item {
     display: grid; grid-template-columns: 180px 1fr auto;
     gap: 18px; align-items: center;
-    padding: 15px 0; border-top: 1px solid var(--line);
+    padding: 15px 0; border-top: 1px solid var(--border);
   }
-  .feed-item .ev { font-weight: 650; font-size: 15px; }
-  .feed-item .chain-pair { font-size: 13px; color: var(--muted); }
-  .chain-pair .arrow { color: var(--green); font-weight: 700; margin: 0 8px; }
+  .feed-item:hover { background: var(--bg-2); }
+  .feed-item .ev { font-weight: 650; font-size: 15px; color: var(--text); }
+  .feed-item .chain-pair { font-size: 13px; color: var(--text-2); }
+  .chain-pair .arrow { color: var(--cyan); font-weight: 700; margin: 0 8px; }
 
   .empty {
-    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
-    padding: 34px 30px; color: var(--muted); font-size: 15px;
+    background: var(--bg-2); border: 1px dashed var(--border); border-radius: 12px;
+    padding: 32px 30px; color: var(--text-2); font-size: 15px; line-height: 1.6;
   }
-  .empty strong { color: var(--ink); }
+  .empty strong { color: var(--text); }
   .empty code {
-    background: var(--paper); padding: 2px 7px; border-radius: 5px;
-    font-family: "Cascadia Mono", Consolas, monospace; font-size: 13px;
+    background: var(--bg); color: var(--cyan); padding: 2px 7px; border-radius: 5px;
+    font-family: var(--mono); font-size: 13px;
   }
 
   .banner {
-    background: var(--amber-s); border-left: 4px solid var(--amber);
+    background: var(--amber-dim); border-left: 3px solid var(--amber);
     padding: 16px 20px; border-radius: 0 10px 10px 0;
-    font-size: 14px; color: #5c3a13; margin-bottom: 34px;
+    font-size: 14px; color: var(--text-2); margin-bottom: 36px; line-height: 1.6;
   }
+  .banner strong { color: var(--amber); }
 
   footer {
-    border-top: 1px solid var(--line); padding-top: 22px; margin-top: 20px;
-    font-size: 13px; color: var(--muted);
+    border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px;
+    font-size: 13px; color: var(--text-2); line-height: 1.65;
   }
-  footer p + p { margin-top: 8px; }
+  footer p + p { margin-top: 10px; }
+  footer strong { color: var(--text); }
+
+  /* ---- wallet / LP panel ---- */
+  .lp {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px 26px; margin-bottom: 48px;
+  }
+  .lp-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap;
+  }
+  .lp-head h3 {
+    font-size: 17px; font-weight: 700; letter-spacing: -.01em; color: var(--text);
+  }
+  .lp-head p { font-size: 13.5px; color: var(--text-2); margin-top: 6px; max-width: 620px; line-height: 1.6; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+    font-family: var(--sans); font-size: 14px; font-weight: 650;
+    padding: 10px 20px; border-radius: 8px; border: 0; cursor: pointer;
+    transition: background .18s, border-color .18s, transform .12s, opacity .18s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--cyan); color: var(--bg); }
+  .btn-primary:hover:not(:disabled) { background: #05c494; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: var(--cyan);
+    border: 1px solid rgba(6,214,160,.35);
+  }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--cyan); background: var(--cyan-dim); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .btn-sm { font-size: 13px; padding: 8px 14px; }
+
+  .lp-body { margin-top: 22px; }
+  .lp-pos {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .lp-pos > div { background: var(--bg-3); padding: 16px 18px; }
+  .lp-pos .k {
+    font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); font-weight: 600; margin-bottom: 8px;
+  }
+  .lp-pos .v {
+    font-family: var(--mono); font-size: 20px; font-weight: 700;
+    font-variant-numeric: tabular-nums; color: var(--text);
+  }
+
+  .lp-actions {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 18px;
+  }
+  .lp-actions input {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    font-family: var(--mono); font-size: 14px; padding: 10px 12px;
+    border-radius: 8px; width: 150px;
+  }
+  .lp-actions input:focus {
+    outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px var(--cyan-dim);
+  }
+  .lp-actions .sep { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
+
+  .lp-msg {
+    margin-top: 16px; padding: 12px 16px; border-radius: 8px;
+    font-size: 13.5px; line-height: 1.55; display: none;
+  }
+  .lp-msg.show { display: block; }
+  .lp-msg.ok   { background: var(--cyan-dim);  color: var(--cyan);  border-left: 3px solid var(--cyan); }
+  .lp-msg.warn { background: var(--amber-dim); color: var(--amber); border-left: 3px solid var(--amber); }
+  .lp-msg.err  { background: var(--red-dim);   color: var(--red);   border-left: 3px solid var(--red); }
+  .lp-msg .mono { display: block; margin-top: 6px; color: var(--text-2); font-size: 12.5px; }
+  .lp-msg a { color: inherit; }
+
+  .lp-bounds {
+    margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--text-2); line-height: 1.65;
+  }
+  .lp-bounds strong { color: var(--text); font-weight: 650; }
+  .lp-bounds code {
+    background: var(--bg); color: var(--cyan); padding: 1px 6px;
+    border-radius: 4px; font-family: var(--mono); font-size: 12.5px;
+  }
+
+  @media (max-width: 560px) {
+    .lp-actions input { width: 100%; }
+    .lp-actions .sep { display: none; }
+    .lp-actions .btn { width: 100%; }
+  }
+
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-scroll table { min-width: 620px; }
+  .metric { min-width: 0; }
 
   @media (max-width: 860px) {
+    .wrap { padding: 0 20px; }
     .trust { grid-template-columns: 1fr 1fr; }
-    .metric.hero .v { font-size: 52px; }
+    .metric.hero .v { font-size: 46px; }
     .feed-item { grid-template-columns: 1fr; gap: 6px; }
+  }
+
+  @media (max-width: 560px) {
+    .trust { grid-template-columns: 1fr; }
+    .metric { padding: 20px; }
+    .metric .v { font-size: 34px; }
+    .metric.hero .v { font-size: 40px; }
+    .logo { font-size: 28px; }
+    .logo .back { display: block; margin: 6px 0 0; }
   }
 </style>
 </head>
@@ -156,7 +292,7 @@
   <header>
     <div class="masthead">
       <div>
-        <div class="logo">Quita</div>
+        <div class="logo">Quita<a class="back" href="../index.html">&larr; overview</a></div>
         <div class="tagline">
           Credit life cover where the loss ratio is a computation, not a claim.
         </div>
@@ -180,7 +316,7 @@
     <div class="metric hero">
       <div class="k">Loss ratio</div>
       <div class="v" id="loss-ratio">—</div>
-      <div class="bench">Brazilian market benchmark ~18%</div>
+      <div class="bench" title="Source: analysis of the Tema 972 litigation and industry commentary. Pending cross-check against public SUSEP statistics.">BR market ~18% &middot; unaudited estimate</div>
       <div class="note" id="loss-note"></div>
     </div>
     <div class="metric">
@@ -204,6 +340,53 @@
     verified by the Attestcoin BlockProver precompile. None of it can be asserted by an operator.
   </p>
 
+  <!-- LP / wallet panel: the only write surface a visitor has -->
+  <section class="lp" id="lp-panel">
+    <div class="lp-head">
+      <div>
+        <h3>Provide capital</h3>
+        <p id="lp-intro">
+          The read-only book above needs no wallet. Connect one to act as a liquidity provider
+          against this same pool &mdash; mint demo qUSD, deposit it, and watch reserves and the
+          solvency ratio move on the figures above. Withdrawal is capped by the pool's free
+          capacity, shown below: capital backing live policies cannot be redeemed, however
+          many shares you hold.
+        </p>
+      </div>
+      <button class="btn btn-primary" id="lp-connect">Connect Wallet</button>
+    </div>
+
+    <div class="lp-body" id="lp-body" hidden>
+      <div class="lp-pos">
+        <div><div class="k">Your address</div><div class="v mono" id="lp-addr" style="font-size:14px">&mdash;</div></div>
+        <div><div class="k">Wallet qUSD</div><div class="v" id="lp-bal">&mdash;</div></div>
+        <div><div class="k">Your shares</div><div class="v" id="lp-shares">&mdash;</div></div>
+        <div><div class="k">Pool share</div><div class="v" id="lp-pct">&mdash;</div></div>
+        <div><div class="k">Redeemable</div><div class="v" id="lp-redeem">&mdash;</div></div>
+        <div><div class="k">Pool free capacity</div><div class="v" id="lp-free">&mdash;</div></div>
+      </div>
+
+      <div class="lp-actions">
+        <button class="btn btn-ghost btn-sm" id="lp-mint">Mint 50,000 qUSD</button>
+        <div class="sep"></div>
+        <input id="lp-amount" type="text" inputmode="decimal" placeholder="10000" aria-label="Amount in qUSD" />
+        <button class="btn btn-primary btn-sm" id="lp-deposit">Deposit</button>
+        <button class="btn btn-ghost btn-sm" id="lp-withdraw">Withdraw</button>
+      </div>
+
+      <div class="lp-msg" id="lp-msg"></div>
+
+      <div class="lp-bounds">
+        <strong>What a wallet deliberately cannot do here.</strong>
+        Policies are created <em>only</em> by a proof of an Ethereum <code>LoanDisbursed</code>
+        event, so there is no <code>underwrite</code> button &mdash; not hidden, absent. Death
+        attestation is restricted to registered attestors and needs a 2-of-3 threshold, and
+        settlement reads the payout from verified state rather than from any caller. The write
+        surface you get is the one that is genuinely permissionless: liquidity.
+      </div>
+    </div>
+  </section>
+
   <!-- Policies -->
   <section>
     <h2>Active policies</h2>
@@ -211,6 +394,7 @@
       No policies yet. Policies can only exist over loans that arrived through a verified proof —
       there is deliberately no operator path to create one.
     </div>
+    <div class="table-scroll">
     <table id="policies-table" hidden>
       <thead>
         <tr>
@@ -220,6 +404,7 @@
       </thead>
       <tbody id="policies-body"></tbody>
     </table>
+    </div>
   </section>
 
   <!-- Verification feed -->
@@ -283,7 +468,45 @@ const ABI = {
   claims: [
     "function challengeWindow() view returns (uint64)",
     "event ClaimSettled(bytes32 indexed loanId, address indexed lender, uint256 payout, uint256 sumInsured)"
+  ],
+  // Write surface. Only what is genuinely permissionless: liquidity provision, and minting
+  // the demo asset (MockStable is a declared mock, freely mintable by design).
+  poolWrite: [
+    "function deposit(uint256 assets) returns (uint256 shares)",
+    "function withdraw(uint256 shares) returns (uint256 assets)",
+    "function sharesOf(address) view returns (uint256)",
+    "function totalShares() view returns (uint256)",
+    "function totalAssets() view returns (uint256)",
+    "function lockedCapital() view returns (uint256)",
+    "function freeCapacity() view returns (uint256)",
+    "function ASSET() view returns (address)",
+    "error ZeroAmount()",
+    "error InsufficientShares(uint256 held, uint256 requested)",
+    "error WithdrawalWouldBreachLockedCapital(uint256 remaining, uint256 locked)"
+  ],
+  erc20: [
+    "function mint(address to, uint256 amount)",
+    "function approve(address spender, uint256 amount) returns (bool)",
+    "function allowance(address owner, address spender) view returns (uint256)",
+    "function balanceOf(address) view returns (uint256)",
+    "function decimals() view returns (uint8)"
   ]
+};
+
+// The two networks a visitor can be asked to join. CC3 is not a default network in any
+// wallet, so we offer to add it rather than telling the user to go and configure one.
+const CHAINS = {
+  31337: {
+    chainId: "0x7a69", chainName: "Hardhat (Quita local demo)",
+    nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+    rpcUrls: ["http://127.0.0.1:8545"], blockExplorerUrls: []
+  },
+  102031: {
+    chainId: "0x18e8f", chainName: "Creditcoin CC3 Testnet",
+    nativeCurrency: { name: "Creditcoin", symbol: "CTC", decimals: 18 },
+    rpcUrls: ["https://rpc.cc3-testnet.creditcoin.network"],
+    blockExplorerUrls: ["https://creditcoin-testnet.blockscout.com"]
+  }
 };
 
 const STATUS = ["None", "Pending", "Active", "Claimed", "Lapsed"];
@@ -334,12 +557,16 @@ async function boot() {
   const mirror = new ethers.Contract(deployment.loanMirror, ABI.mirror, provider);
   const claims = new ethers.Contract(deployment.claimEngine, ABI.claims, provider);
 
+  const refreshBook = () => renderTrust(pool, registry, mirror);
+
   await Promise.all([
-    renderTrust(pool, registry, mirror),
+    refreshBook(),
     renderChallengeWindow(claims),
     renderPolicies(registry),
-    renderFeed(provider, mirror, claims)
+    renderFeed(provider, mirror, claims, deployment.deployedAtBlock)
   ]);
+
+  initWallet(deployment, refreshBook);
 }
 
 async function renderTrust(pool, registry, mirror) {
@@ -408,14 +635,23 @@ async function renderPolicies(registry) {
   el("policies-table").hidden = false;
 }
 
-async function renderFeed(provider, mirror, claims) {
+async function renderFeed(provider, mirror, claims, deployedAtBlock) {
   const head = await provider.getBlockNumber();
-  const from = Math.max(0, head - (LOCAL ? head : 200000));
+  // Scan from the block the contracts were deployed in. A blind 200k-block window is both
+  // pointless (nothing existed before deployment) and slow enough on a public RPC that the feed
+  // looks broken while it grinds.
+  const from = deployedAtBlock !== undefined && deployedAtBlock !== null
+    ? Math.max(0, Number(deployedAtBlock) - 1)
+    : Math.max(0, head - (LOCAL ? head : 50000));
+
+  // A failed range query must not look like an empty feed. Track it and say so.
+  let queryFailed = false;
+  const safely = (p) => p.catch((err) => { queryFailed = true; console.error(err); return []; });
 
   const [mirrored, updated, settled] = await Promise.all([
-    mirror.queryFilter(mirror.filters.LoanMirrored(), from, head).catch(() => []),
-    mirror.queryFilter(mirror.filters.OutstandingUpdated(), from, head).catch(() => []),
-    claims.queryFilter(claims.filters.ClaimSettled(), from, head).catch(() => [])
+    safely(mirror.queryFilter(mirror.filters.LoanMirrored(), from, head)),
+    safely(mirror.queryFilter(mirror.filters.OutstandingUpdated(), from, head)),
+    safely(claims.queryFilter(claims.filters.ClaimSettled(), from, head))
   ]);
 
   const items = [
@@ -424,7 +660,16 @@ async function renderFeed(provider, mirror, claims) {
     ...settled.map((e) => ({ ev: "ClaimSettled", detail: "paid to lender", e }))
   ].sort((a, b) => b.e.blockNumber - a.e.blockNumber).slice(0, 12);
 
-  if (items.length === 0) { el("feed-empty").hidden = false; return; }
+  if (items.length === 0) {
+    el("feed-empty").hidden = false;
+    if (queryFailed) {
+      el("feed-empty").innerHTML =
+        "<strong>Could not read the event log.</strong> The RPC rejected or dropped the range " +
+        "query, so this is a reading failure, not an empty book. Reload, or check the contracts " +
+        "directly on the explorer.";
+    }
+    return;
+  }
 
   el("feed").innerHTML = items.map((it) =>
     '<div class="feed-item">' +
@@ -438,6 +683,265 @@ async function renderFeed(provider, mirror, claims) {
           '" target="_blank" rel="noopener">' + short(it.e.transactionHash) + "</a>") + "</div>" +
     "</div>"
   ).join("");
+}
+
+// ---------------------------------------------------------------------------
+// Wallet / LP panel
+//
+// The book above is read-only and needs no wallet; that is the point of it. This panel is the
+// one place a visitor can write, and it is limited to the surface that is actually
+// permissionless in the contracts: CapitalPool.deposit / withdraw, plus minting the declared
+// mock settlement asset. Underwriting and death attestation are not exposed because they are
+// not open to arbitrary callers by design.
+// ---------------------------------------------------------------------------
+
+const MINT_AMOUNT = 50000n;           // qUSD handed out per click
+const UNITS = 10n ** 6n;              // MockStable uses 6 decimals
+
+let wallet = null;                    // { signer, address, pool, asset }
+
+function lpMsg(kind, html) {
+  const box = el("lp-msg");
+  box.className = "lp-msg show " + kind;
+  box.innerHTML = html;
+}
+function lpClear() { el("lp-msg").className = "lp-msg"; }
+function lpBusy(on) {
+  ["lp-mint", "lp-deposit", "lp-withdraw"].forEach((id) => { el(id).disabled = on; });
+}
+
+const qusd = (v) =>
+  Number(ethers.formatUnits(v, 6)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+
+function explorerTx(hash) {
+  if (LOCAL) return '<span class="mono">' + short(hash) + "</span>";
+  return '<a href="' + EXPLORER_CC + "/tx/" + hash + '" target="_blank" rel="noopener">' +
+         short(hash) + "</a>";
+}
+
+// Every provider stack nests revert data somewhere different: ethers puts it on err.data,
+// Hardhat's JSON-RPC wraps it as err.data.data, MetaMask has used err.info.error.data. Rather
+// than guess, walk the error for any hex blob the pool's ABI can name. Measured against a real
+// revert: the hex sat at err.data.data, which none of the documented paths would have found.
+function findRevertData(err, iface, depth) {
+  if (depth === undefined) depth = 0;
+  if (err == null || depth > 4) return null;
+
+  if (typeof err === "string") {
+    if (!/^0x[0-9a-fA-F]{8,}$/.test(err)) return null;
+    try { return iface.parseError(err); } catch { return null; }
+  }
+  if (typeof err !== "object") return null;
+
+  // An already-decoded description, whatever key it arrived under.
+  if (err.name && Array.isArray(err.args)) return err;
+
+  for (const key of ["data", "revert", "error", "info", "cause", "parent"]) {
+    if (key in err) {
+      const hit = findRevertData(err[key], iface, depth + 1);
+      if (hit) return hit;
+    }
+  }
+  return null;
+}
+
+// Turn a revert into something that explains the protocol instead of leaking hex.
+function explainError(err, poolContract) {
+  if (err && (err.code === 4001 || err.code === "ACTION_REJECTED")) {
+    return { kind: "warn", html: "Transaction rejected in the wallet." };
+  }
+  {
+    const parsed = findRevertData(err, poolContract.interface);
+    if (parsed) {
+      if (parsed.name === "WithdrawalWouldBreachLockedCapital") {
+        const remaining = parsed.args[0], locked = parsed.args[1];
+        return {
+          kind: "warn",
+          html: "<strong>Refused by the protocol, and correctly so.</strong> That withdrawal " +
+                "would leave " + qusd(remaining) + " qUSD against " + qusd(locked) +
+                " qUSD locked behind live policies. Liquidity provision is subordinate to the " +
+                "promise made to policyholders — an LP cannot withdraw cover out from " +
+                "under a policy." +
+                '<span class="mono">CapitalPool.WithdrawalWouldBreachLockedCapital(' +
+                remaining + ", " + locked + ")</span>"
+        };
+      }
+      if (parsed.name === "InsufficientShares") {
+        return { kind: "err", html: "You hold " + qusd(parsed.args[0]) +
+                 " shares; you asked to redeem " + qusd(parsed.args[1]) + "." };
+      }
+      if (parsed.name === "ZeroAmount") {
+        return { kind: "err", html: "Enter an amount greater than zero." };
+      }
+      return { kind: "err", html: "Reverted with <code>" + parsed.name + "</code>." };
+    }
+  }
+  const reason = err?.shortMessage || err?.reason || err?.message || String(err);
+  return { kind: "err", html: 'Transaction failed.<span class="mono">' + reason + "</span>" };
+}
+
+async function ensureChain(eth, wantChainId) {
+  const current = await eth.request({ method: "eth_chainId" });
+  if (parseInt(current, 16) === wantChainId) return true;
+
+  const spec = CHAINS[wantChainId];
+  if (!spec) {
+    lpMsg("err", "This page is pointed at chain " + wantChainId +
+          ", which the panel has no network definition for.");
+    return false;
+  }
+  try {
+    await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: spec.chainId }] });
+    return true;
+  } catch (err) {
+    // 4902 = chain unknown to the wallet. Offer to add it rather than instructing the user.
+    if (err && (err.code === 4902 || err.code === -32603)) {
+      try {
+        await eth.request({ method: "wallet_addEthereumChain", params: [spec] });
+        return true;
+      } catch {
+        lpMsg("warn", "Could not add " + spec.chainName + " to the wallet. Add it manually: " +
+              "RPC <code>" + spec.rpcUrls[0] + "</code>, chain ID <code>" + wantChainId + "</code>.");
+        return false;
+      }
+    }
+    lpMsg("warn", "Please switch the wallet to <strong>" + spec.chainName + "</strong> to continue.");
+    return false;
+  }
+}
+
+function initWallet(deployment, refreshBook) {
+  const eth = window.ethereum;
+  const connectBtn = el("lp-connect");
+
+  if (!eth) {
+    connectBtn.disabled = true;
+    connectBtn.textContent = "No wallet detected";
+    el("lp-intro").innerHTML =
+      "The read-only book above needs no wallet, and that is the point of it. To act as a " +
+      "liquidity provider against this pool you need an EIP-1193 wallet such as MetaMask; " +
+      "none is injected in this browser.";
+    return;
+  }
+
+  const wantChainId = Number(deployment.chainId);
+  const poolIface = new ethers.Contract(deployment.capitalPool, ABI.poolWrite);
+
+  async function refreshPosition() {
+    const pool = wallet.pool, asset = wallet.asset, address = wallet.address;
+    const [shares, totalShares, totalAssets, bal, free] = await Promise.all([
+      pool.sharesOf(address), pool.totalShares(), pool.totalAssets(),
+      asset.balanceOf(address), pool.freeCapacity()
+    ]);
+    el("lp-addr").textContent = short(address);
+    el("lp-bal").textContent = qusd(bal);
+    el("lp-shares").textContent = qusd(shares);
+    el("lp-pct").textContent =
+      totalShares === 0n ? "—" : (Number(shares) / Number(totalShares) * 100).toFixed(2) + "%";
+    el("lp-redeem").textContent =
+      totalShares === 0n ? "0" : qusd(shares * totalAssets / totalShares);
+    el("lp-free").textContent = qusd(free);
+  }
+
+  async function afterTx(label, tx) {
+    lpMsg("ok", label + " submitted. Waiting for confirmation…" +
+          '<span class="mono">' + explorerTx(tx.hash) + "</span>");
+    const receipt = await tx.wait();
+    lpMsg("ok", "<strong>" + label + " confirmed.</strong> Block " +
+          receipt.blockNumber.toLocaleString("en-US") + "." +
+          '<span class="mono">' + explorerTx(tx.hash) + "</span>");
+    await Promise.all([refreshPosition(), refreshBook()]);
+  }
+
+  function amountInUnits() {
+    const raw = (el("lp-amount").value || "").trim();
+    if (!raw) return null;
+    try {
+      const v = ethers.parseUnits(raw, 6);
+      return v > 0n ? v : null;
+    } catch { return null; }
+  }
+
+  connectBtn.addEventListener("click", async () => {
+    lpClear();
+    connectBtn.disabled = true;
+    try {
+      const accounts = await eth.request({ method: "eth_requestAccounts" });
+      if (!accounts || accounts.length === 0) throw new Error("no account authorised");
+      if (!(await ensureChain(eth, wantChainId))) { connectBtn.disabled = false; return; }
+
+      const signer = await new ethers.BrowserProvider(eth).getSigner();
+      const address = await signer.getAddress();
+      const pool = new ethers.Contract(deployment.capitalPool, ABI.poolWrite, signer);
+      const assetAddress = deployment.mockStable || (await pool.ASSET());
+      const asset = new ethers.Contract(assetAddress, ABI.erc20, signer);
+
+      wallet = { signer, address, pool, asset };
+
+      connectBtn.textContent = "Connected";
+      connectBtn.classList.remove("btn-primary");
+      connectBtn.classList.add("btn-ghost");
+      el("lp-body").hidden = false;
+      await refreshPosition();
+    } catch (err) {
+      connectBtn.disabled = false;
+      const e = explainError(err, poolIface);
+      lpMsg(e.kind, e.html);
+    }
+  });
+
+  el("lp-mint").addEventListener("click", async () => {
+    lpClear(); lpBusy(true);
+    try {
+      const tx = await wallet.asset.mint(wallet.address, MINT_AMOUNT * UNITS);
+      await afterTx("Mint of " + Number(MINT_AMOUNT).toLocaleString("en-US") + " demo qUSD", tx);
+    } catch (err) {
+      const e = explainError(err, wallet.pool); lpMsg(e.kind, e.html);
+    } finally { lpBusy(false); }
+  });
+
+  el("lp-deposit").addEventListener("click", async () => {
+    lpClear();
+    const amount = amountInUnits();
+    if (amount === null) { lpMsg("err", "Enter an amount in qUSD, for example 10000."); return; }
+    lpBusy(true);
+    try {
+      const held = await wallet.asset.balanceOf(wallet.address);
+      if (held < amount) {
+        lpMsg("warn", "Wallet holds " + qusd(held) + " qUSD. Mint some demo qUSD first.");
+        return;
+      }
+      const poolAddress = await wallet.pool.getAddress();
+      const allowance = await wallet.asset.allowance(wallet.address, poolAddress);
+      if (allowance < amount) {
+        lpMsg("ok", "Approving the pool to move " + qusd(amount) + " qUSD…");
+        await (await wallet.asset.approve(poolAddress, amount)).wait();
+      }
+      const tx = await wallet.pool.deposit(amount);
+      await afterTx("Deposit of " + qusd(amount) + " qUSD", tx);
+    } catch (err) {
+      const e = explainError(err, wallet.pool); lpMsg(e.kind, e.html);
+    } finally { lpBusy(false); }
+  });
+
+  el("lp-withdraw").addEventListener("click", async () => {
+    lpClear();
+    const amount = amountInUnits();
+    if (amount === null) { lpMsg("err", "Enter an amount of shares to redeem."); return; }
+    lpBusy(true);
+    try {
+      const tx = await wallet.pool.withdraw(amount);
+      await afterTx("Withdrawal of " + qusd(amount) + " shares", tx);
+    } catch (err) {
+      const e = explainError(err, wallet.pool); lpMsg(e.kind, e.html);
+    } finally { lpBusy(false); }
+  });
+
+  // A wallet that changes account or network mid-session must not keep showing stale state.
+  if (eth.on) {
+    eth.on("accountsChanged", () => location.reload());
+    eth.on("chainChanged", () => location.reload());
+  }
 }
 
 boot().catch((err) => {

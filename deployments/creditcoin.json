@@ -1,0 +1,14 @@
+{
+  "network": "creditcoin",
+  "chainId": "102031",
+  "sourceChainKey": 1,
+  "sourceEmitter": "0xc7624150c28bF26cdF920A0715a7c0ba614faE16",
+  "mockStable": "0x68Dd244C1C5eB3CA1545764d659cd9c2FAbB193d",
+  "loanMirror": "0x60690F414006008984801DBc550C1348B256820f",
+  "capitalPool": "0x333a96748260e55342baA06d4e633757093EFBC4",
+  "policyRegistry": "0x36A8F3FAaD2CBca570B524f29A0fd4fbc694cb38",
+  "claimEngine": "0x5A2C3e566E5DFBA29059306BB577b292D0F07f3C",
+  "deployedAtBlock": 5483325,
+  "deployer": "0x4e5A7B9F7F66c208bDDeD352356B33a3A634AD6D",
+  "timestamp": "2026-09-13T23:14:44.612Z"
+}

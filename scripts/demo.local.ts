@@ -514,7 +514,7 @@ async function main() {
   const u = (v: bigint) => ethers.formatUnits(v, 6);
 
   const policyTotal = Number(await registry.policyCount());
-  line(`  loss ratio           ${pct(loss)}   (market benchmark ~18%)`);
+  line(`  loss ratio           ${pct(loss)}   (BR market ~18%, unaudited estimate)`);
   line(`     NOTE: one claim against a demo book of ${policyTotal} policies. A real book prices`);
   line(`     for roughly one death per thousand policy-years, so this ratio is a demonstration`);
   line(`     of the MECHANISM, not a market-comparable figure.`);
@@ -587,8 +587,8 @@ async function main() {
   line(`  deployments/localhost.json written`);
   line(``);
   line(`  To see the dashboard against this run:`);
-  line(`    npx http-server frontend -p 8080   (or any static server)`);
-  line(`    open http://localhost:8080/?net=local`);
+  line(`    npx http-server . -p 8080   (from the repo root, or any static server)`);
+  line(`    open http://localhost:8080/frontend/index.html?net=local`);
   line(``);
   line(`  Keep the hardhat node running or the dashboard has nothing to read.`);
 }

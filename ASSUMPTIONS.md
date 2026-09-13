@@ -101,6 +101,60 @@ valid proof rejected.
 
 ---
 
+## Frontend
+
+**The dashboard is read-only by default; the wallet panel exposes only the permissionless
+surface.** A visitor can connect a wallet to mint the declared mock settlement asset, deposit
+into `CapitalPool` and withdraw shares. Those are the functions that carry no access control in
+the contracts. `underwrite`, death attestation and `settle` are deliberately absent from the UI:
+policies exist only as a consequence of a verified `LoanDisbursed` proof, attestation is limited
+to registered attestors under a 2-of-3 threshold, and settlement reads the payout from verified
+state. Adding buttons for those would have meant either lying about what they do or weakening
+the contracts, so the panel says plainly what it cannot do and why.
+
+**Revert data is located by walking the error object, not by a fixed path.** Every layer nests it
+differently. Measured against a real `WithdrawalWouldBreachLockedCapital` revert through
+Hardhat's JSON-RPC, the hex sat at `err.data.data`, which none of the paths ethers documents
+(`err.data`, `err.revert`, `err.info.error.data`) would have found. `findRevertData` searches a
+bounded set of keys to depth 4 and only accepts a blob the pool ABI can name, so a transport
+error cannot be mistaken for a protocol one.
+
+**Static HTML with the ethers UMD build, not Vite + React + wagmi.** The original plan named the
+latter. Two static files with no build step are faster to serve, faster to audit, and cannot
+break in a bundler the day before submission; the interactivity needed here does not justify a
+toolchain.
+
+**The landing page's market figures carry an explicit source caveat.** The generated draft
+asserted "~18% loss ratio" and "87% commission" as fact. Both now name the Tema 972 litigation
+analysis as the source and state that it is pending cross-check against SUSEP statistics, which
+is the same standard the README and deck already used.
+
+---
+
+## Fixed during the first real deployment
+
+Two config bugs that only surface when deploying for real, both found on 2026-09-13:
+
+**`accounts()` required exactly 66 characters, so a key without the `0x` prefix silently
+produced no signer.** `(key: string) => key.length === 66 ? [key] : []` returns an empty array
+for a perfectly valid 64-hex key, and the failure then appears much later as "No signer
+available" in the deploy script, far from the cause. It now normalises the prefix and throws on a
+malformed key, because a typo in `.env` should be loud.
+
+**`CREDITCOIN_PRIVATE_KEY ?? PRIVATE_KEY` did not fall back.** `.env.example` documents that the
+Creditcoin key defaults to `PRIVATE_KEY` when unset, but `??` only treats `null`/`undefined` as
+absent. An empty `CREDITCOIN_PRIVATE_KEY=` line — which is exactly what `.env.example` ships —
+is a string, so it won, and the Creditcoin network ended up with no signer. Now trimmed and
+treated as absent, matching the documented behaviour.
+
+**`npm run preflight` was added** as a pre-deployment gate. The sequence spans two chains and the
+order is forced, so running out of Sepolia gas after `QuitaOrigin` deploys but before the demo
+event would leave an origin contract with nothing to prove. It refuses to proceed under 3x the
+measured cost and prints the exact shortfall. Gas rose from 1.02 to 2.21 gwei between the first
+measurement and the first attempt, which is precisely the volatility it guards against.
+
+---
+
 ## Open / pending
 
 **No deployment yet — no testnet funds.** Everything is built and tested locally. Deployment is

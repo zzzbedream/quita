@@ -8,6 +8,7 @@
     "build": "hardhat compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
+    "preflight": "hardhat run scripts/preflight.ts --network sepolia",
     "probe": "hardhat run scripts/probe.ts --network creditcoin",
     "deploy:origin": "hardhat run scripts/deploy.origin.ts --network sepolia",
     "deploy:creditcoin": "hardhat run scripts/deploy.creditcoin.ts --network creditcoin",

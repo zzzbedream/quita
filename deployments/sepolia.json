@@ -1,0 +1,8 @@
+{
+  "network": "sepolia",
+  "chainId": "11155111",
+  "quitaOrigin": "0xc7624150c28bF26cdF920A0715a7c0ba614faE16",
+  "deployedAtBlock": 11699031,
+  "deployer": "0x4e5A7B9F7F66c208bDDeD352356B33a3A634AD6D",
+  "timestamp": "2026-09-13T23:11:35.795Z"
+}
