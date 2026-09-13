@@ -24,10 +24,15 @@ be done while waiting.
       pinned to the origin address above, `challengeWindow=120s` for the demo.
 - [x] **5. `npm run emit:demo`** — real `LoanDisbursed` emitted in Sepolia block 11,699,049,
       status 1. Tx `0xabafe0f2866dd4e63e5afe982b33b046cfdfc9cc24ab11431eb5ef7a952435dd`.
-- [ ] **6. `verify:e2e`** — **running now.** The prover answered and is waiting for the source
-      height to be attested (needs 11,699,049; latest attested was 11,699,010 at start). This is
-      the step that had never touched the real prover.
+- [x] **6. `verify:e2e` — PASSED ON THE FIRST ATTEMPT against the real prover.** 468.3s total,
+      452.6s of it Ethereum finality. Proof: 8 siblings, 2 continuity roots. Verified in CC3
+      block 5,483,358, gasUsed 257,039. Creditcoin tx
+      `0xb7f0eb0d95a80c35b8ecc75c93e28033159df053468a89c7d4b9a2bb60c0932b`.
 - [x] **7. Deployed-addresses table** in `README.md` — filled in with explorer links.
+- [x] **7b. Capital seeded on live CC3** — 1,000,000 qUSD deposited, so the dashboard reads
+      reserves 1,000,000 and solvency 10.00x against the real testnet rather than zeros.
+      `demo.seed.ts` deliberately does not touch `LoanMirror`: loan state is reachable only
+      through a verified proof.
 - [ ] **8. Record the video.** Mandatory form field. Script: [`VIDEO_SCRIPT.md`](VIDEO_SCRIPT.md),
       talking points and judge Q&A: [`PITCH.md`](PITCH.md). Real hashes now exist for both
       explorers — see the table in the README.
@@ -40,7 +45,9 @@ be done while waiting.
 - [ ] Run the secret-hygiene commands at the end of this document.
 - [ ] Push the repo public and confirm the raw logo/deck URLs resolve.
 
-### Fallback if step 6 will not cooperate
+### Fallback if step 6 will not cooperate — no longer needed
+
+Step 6 passed. Kept for the record.
 
 The requirement "must be deployed on a testnet" is **already satisfied** — six contracts are live
 on two testnets with verifiable addresses. Step 6 is about proving the cross-chain path
@@ -55,6 +62,8 @@ waiting for it" is worth more than a vague claim of success.
 ### Already done
 
 - [x] **Deployed on two testnets** — the hard eligibility requirement, satisfied.
+- [x] **Cross-chain verification proved end to end on live testnet.** Both tx hashes are in the
+      README and on public explorers. This is the scoring criterion, not just eligibility.
 - [x] 6 contracts, 4 events verified through 3 consumers.
 - [x] 79 tests passing in ~1s, `tsc --noEmit` clean.
 - [x] `npm run probe` confirms live: CC3 chainId 102031, ChainInfo reports `chainKey 1` =
@@ -148,6 +157,14 @@ Long form (~180 words):
 
     Writability (Creditcoin -> Ethereum) is not used: the documentation states it is undergoing
     third-party testing and audits, so the integration is read-only Ethereum -> Creditcoin.
+
+    This is live, not a description. On 2026-09-13 a loan disbursed on Sepolia (tx
+    0xabafe0f2866dd4e63e5afe982b33b046cfdfc9cc24ab11431eb5ef7a952435dd, block 11699049) was
+    reconstructed on Creditcoin (tx
+    0xb7f0eb0d95a80c35b8ecc75c93e28033159df053468a89c7d4b9a2bb60c0932b, block 5483358) through a
+    proof with 8 Merkle siblings and 2 continuity roots, verified by the precompile for 257,039
+    gas. End-to-end latency was 468 seconds, 453 of which were Ethereum finality. Both
+    transactions are on public explorers.
 
 ### GitHub Repository URL
 

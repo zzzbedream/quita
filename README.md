@@ -208,6 +208,50 @@ address above as the only accepted log emitter — a proof from any other contra
 
 `MockStable` is the declared mock settlement asset. It is freely mintable and has no value.
 
+## Verified end-to-end on testnet
+
+Run on 2026-09-13. A loan originated on Ethereum and reconstructed on Creditcoin through a
+Merkle inclusion proof verified by the BlockProver precompile — no oracle, no relayer trust.
+
+| Phase | Time | Detail |
+|---|---|---|
+| Source receipt | 0.4s | Sepolia block 11,699,049, status 1 |
+| Await attestation | **452.6s** | Ethereum finality, the dominant cost |
+| Build proof | 0.4s | 8 siblings, 2 continuity roots |
+| Submit + verify | 12.4s | CC3 block 5,483,358, **gasUsed 257,039** |
+| **Total** | **468.3s** | |
+
+Both sides are public:
+
+- **Sepolia** — [`0xabafe0f2…52435dd`](https://sepolia.etherscan.io/tx/0xabafe0f2866dd4e63e5afe982b33b046cfdfc9cc24ab11431eb5ef7a952435dd)
+  emits `LoanDisbursed`
+- **Creditcoin** — [`0xb7f0eb0d…c0932b`](https://creditcoin-testnet.blockscout.com/tx/0xb7f0eb0d95a80c35b8ecc75c93e28033159df053468a89c7d4b9a2bb60c0932b)
+  verifies the proof and mirrors the loan
+
+Resulting state on `LoanMirror`, none of it assertable by an operator:
+
+```
+loanId      : 0x29a94095c432a6d2d1c9401f2d38743586a800762a40a001087939930e71e92e
+commitment  : 0xb0b81940dde296c56947e4b117ba792e1456c7d4138422f0e47405d2e5916191
+lender      : 0x4e5A7B9F7F66c208bDDeD352356B33a3A634AD6D
+principal   : 25000.0
+outstanding : 25000.0
+active      : true
+```
+
+The borrower is present only as `borrowerCommitment`, a salted hash. No identifier appears
+on-chain, on either side.
+
+Reproduce it:
+
+```bash
+npm run preflight        # gas gate for the two-chain sequence
+npm run deploy:origin
+npm run deploy:creditcoin
+npm run emit:demo        # prints the source txHash
+DEMO_TX_HASH=0x... npm run verify:e2e
+```
+
 ## Network reference
 
 | | |
