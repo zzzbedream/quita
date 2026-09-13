@@ -29,3 +29,5 @@ docs/PITCH.md
 # vercel build output
 public/
 .vercel/
+
+.vercel
