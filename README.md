@@ -4,6 +4,10 @@
 
 Built for **BUIDL CTC 2026 Fall** · Track: **RWA** · Powered by the **Attestcoin Protocol**
 
+**Live:** [quita-protocol.vercel.app](https://quita-protocol.vercel.app) — the overview, and a
+[dashboard](https://quita-protocol.vercel.app/frontend/index.html) reading the deployed contracts
+on Creditcoin CC3 Testnet. No wallet needed to read it.
+
 ---
 
 ## The problem

@@ -74,6 +74,8 @@ waiting for it" is worth more than a vague claim of success.
 - [x] Deck PDF, video script, demo runbook, pitch + judge Q&A.
 - [x] Project overview page and live dashboard with wallet-gated LP panel.
 - [x] Logo (SVG + PNG).
+- [x] Live site on Vercel at `quita-protocol.vercel.app`, reachable anonymously, reading the
+      deployed CC3 contracts.
 
 ---
 
@@ -165,6 +167,13 @@ Long form (~180 words):
     proof with 8 Merkle siblings and 2 continuity roots, verified by the precompile for 257,039
     gas. End-to-end latency was 468 seconds, 453 of which were Ethereum finality. Both
     transactions are on public explorers.
+
+### Live demo (not a named form field, but worth pasting into the description)
+
+    https://quita-protocol.vercel.app
+
+Publicly reachable with no Vercel login — SSO deployment protection is explicitly disabled, and
+that was verified with an anonymous request, not by loading it while signed in.
 
 ### GitHub Repository URL
 
