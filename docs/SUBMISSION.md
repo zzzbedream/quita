@@ -33,9 +33,9 @@ be done while waiting.
       reserves 1,000,000 and solvency 10.00x against the real testnet rather than zeros.
       `demo.seed.ts` deliberately does not touch `LoanMirror`: loan state is reachable only
       through a verified proof.
-- [ ] **8. Record the video.** Mandatory form field. Script: [`VIDEO_SCRIPT.md`](VIDEO_SCRIPT.md),
-      talking points and judge Q&A: [`PITCH.md`](PITCH.md). Real hashes now exist for both
-      explorers — see the table in the README.
+- [ ] **8. Record the video.** Mandatory form field. Script and judge Q&A are in
+      `docs/VIDEO_SCRIPT.md` and `docs/PITCH.md`, kept local and gitignored. Real hashes now
+      exist for both explorers — see the table in the README.
 - [ ] **9. Submit**, with the field text from this document.
 
 ### Non-blocking, do while waiting for finality
@@ -185,7 +185,7 @@ inline view, upload the same file to Drive/Dropbox and use that link instead.
 
 ### Prototype Demo Video URL
 
-**`TODO(BLOQUEO)`** — not recorded yet. Script ready at [`docs/VIDEO_SCRIPT.md`](VIDEO_SCRIPT.md),
+**`TODO(BLOQUEO)`** — not recorded yet. Script at `docs/VIDEO_SCRIPT.md` (local only),
 runbook at [`docs/DEMO_RUNBOOK.md`](DEMO_RUNBOOK.md). 3-4 minutes, showing real hashes in both
 explorers. **This is a mandatory form field — the one deliverable that cannot be skipped.**
 

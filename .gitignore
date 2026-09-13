@@ -21,3 +21,11 @@ deployments/localhost.json
 # local agent / design tooling, not part of the submission
 .claude/
 .stitch/
+
+# internal recording prep, kept local
+docs/VIDEO_SCRIPT.md
+docs/PITCH.md
+
+# vercel build output
+public/
+.vercel/
