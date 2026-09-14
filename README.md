@@ -246,6 +246,36 @@ active      : true
 The borrower is present only as `borrowerCommitment`, a salted hash. No identifier appears
 on-chain, on either side.
 
+### The full cycle, settled on testnet
+
+Beyond the single mirrored loan above, the whole claim path ran against the live network:
+
+| Step | Chain | Evidence |
+|---|---|---|
+| Loan disbursed | Sepolia | [`0xf580a843…`](https://sepolia.etherscan.io/tx/0xf580a843bc409665333e9af216c9ffc7f1c5d9d59aa3abdca57b809ed333b43a) |
+| → proved, loan mirrored | CC3 | [`0xd15e71ef…`](https://creditcoin-testnet.blockscout.com/tx/0xd15e71ef9bb353951e734398bc00d3b59ce2d5b942400be8974631679bab529c) · gas 239,302 |
+| Repayment of 5,000 | Sepolia | [`0xd2c01a9e…`](https://sepolia.etherscan.io/tx/0xd2c01a9eaab25a871b266d651cca9e9d5b0ff8176f9446056582b8a9c85e3cfb) |
+| → proved, outstanding 25,000 → 20,000 | CC3 | [`0xef4c86df…`](https://creditcoin-testnet.blockscout.com/tx/0xef4c86df749446b18cc816269e15b5ded645956d122e61399549830bed551c02) · gas 161,000 |
+| Death attested (1 of 2) | Sepolia | [`0xb0e78b8d…`](https://sepolia.etherscan.io/tx/0xb0e78b8de5fc4388ce58e7d13bdffb0ad771d91fd1111937599c3ed7f13184e2) |
+| Death attested (2 of 2) | Sepolia | [`0xee797093…`](https://sepolia.etherscan.io/tx/0xee7970931d131aa2591334e72672e337c68445560acd03f98c222a56dc654f51) |
+| → both proved, threshold reached | CC3 | [`0xe2434179…`](https://creditcoin-testnet.blockscout.com/tx/0xe2434179876dd660ed6407fd34f3edc8b2c1c71a11503e6e5cff7b1187d8e343) · [`0x04d6ea02…`](https://creditcoin-testnet.blockscout.com/tx/0x04d6ea02f319140860e86513bbf2d16fb187083313ba3037e6d32a066591a7b3) |
+| Challenge window | CC3 | 120s, waited in real time |
+| **Settled to the lender** | CC3 | [`0x4c4ea35b…`](https://creditcoin-testnet.blockscout.com/tx/0x4c4ea35ba352309d8ed1d9b37b004b6e26329f0275247163f2d7d4bb2d52d1b7) · gas 540,624 |
+| Premium paid | Sepolia | [`0x257801dc…`](https://sepolia.etherscan.io/tx/0x257801dce1644f1f71edb7008e62355e23ff612021bd27401f1791e17d5dae43) |
+| → proved, premium credited | CC3 | [`0x36a0252e…`](https://creditcoin-testnet.blockscout.com/tx/0x36a0252e5ae2826604840928ca0cf26c5eef1239dc82c0c32d983aa3689a6c55) · gas 274,526 |
+
+All four `QuitaOrigin` events — `LoanDisbursed`, `RepaymentMade`, `PremiumPaid`, `DeathAttested`
+— are therefore proved on live testnet, not three plus an assertion.
+
+**The payout was 20,000, not the 25,000 originally insured.** The repayment had reduced the
+outstanding balance, and the payout followed it, because settlement reads
+`min(sumInsured, outstanding)` from proved state and never from the attestation. That is the
+invariant the whole design rests on, and it is visible in those two transactions.
+
+The attestors are registered separately on `QuitaOrigin` and on `ClaimEngine`. Being trusted on
+the source chain does not make you trusted on Creditcoin — the execution chain keeps its own
+list, which is why the first claim submission was correctly rejected with `NotAnAttestor`.
+
 Reproduce it:
 
 ```bash

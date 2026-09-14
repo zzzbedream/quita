@@ -33,6 +33,7 @@ be done while waiting.
       reserves 1,000,000 and solvency 10.00x against the real testnet rather than zeros.
       `demo.seed.ts` deliberately does not touch `LoanMirror`: loan state is reachable only
       through a verified proof.
+- [x] **7c. Full claim cycle settled on live CC3.** See the evidence table in the README.
 - [ ] **8. Record the video.** Mandatory form field. Script and judge Q&A are in
       `docs/VIDEO_SCRIPT.md` and `docs/PITCH.md`, kept local and gitignored. Real hashes now
       exist for both explorers — see the table in the README.
@@ -62,8 +63,14 @@ waiting for it" is worth more than a vague claim of success.
 ### Already done
 
 - [x] **Deployed on two testnets** — the hard eligibility requirement, satisfied.
-- [x] **Cross-chain verification proved end to end on live testnet.** Both tx hashes are in the
+- [x] **Cross-chain verification proved end to end on live testnet.** All tx hashes are in the
       README and on public explorers. This is the scoring criterion, not just eligibility.
+- [x] **All four source events proved on live testnet** — `LoanDisbursed`, `RepaymentMade`,
+      `PremiumPaid`, `DeathAttested`. Thirteen transactions across both chains, every one
+      status 1, checked by querying the receipts rather than by trusting the script output.
+- [x] **A claim settled on live testnet.** 2-of-3 attestation threshold reached, the 120s
+      challenge window waited out in real time, 20,000 qUSD paid to the lender. The payout was
+      the outstanding balance after a proved repayment, not the original sum insured.
 - [x] 6 contracts, 4 events verified through 3 consumers.
 - [x] 79 tests passing in ~1s, `tsc --noEmit` clean.
 - [x] `npm run probe` confirms live: CC3 chainId 102031, ChainInfo reports `chainKey 1` =

@@ -588,8 +588,9 @@ async function renderTrust(pool, registry, mirror) {
   const n = Number(active) + (Number(claimsPaid) > 0 ? 1 : 0);
   if (ratioPct !== null && n < 100) {
     el("loss-note").textContent =
-      "Demo book of " + n + " policies. A real book prices for roughly one death per thousand " +
-      "policy-years, so this is the mechanism working, not a comparable rate.";
+      "Demo book of " + n + (n === 1 ? " policy" : " policies") +
+      ". A real book prices for roughly one death per thousand policy-years, so this is the " +
+      "mechanism working, not a comparable rate.";
   }
   el("solvency").textContent = mcr === 0n ? "∞" : ratio(solv);
   el("mcr-note").textContent = "MCR " + usd(mcr) + " · assets " + usd(assets);
