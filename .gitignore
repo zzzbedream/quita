@@ -31,3 +31,7 @@ public/
 .vercel/
 
 .vercel
+
+# scratch
+_*.mjs
+_tmp.*
