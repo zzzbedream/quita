@@ -608,30 +608,33 @@ async function renderTrust(pool, registry, mirror) {
   const ratioPct = premiums === 0n ? null : Number(loss) / 1e18 * 100;
   const credible = written >= CREDIBLE_POLICIES;
 
-  el("loss-ratio").textContent = ratioPct === null ? "n/a" : pct(loss);
-  el("loss-ratio").className = "v" + (
-    ratioPct === null ? ""
-      : !credible ? " uncredible"
-      : ratioPct > 100 ? " bad"
-      : ratioPct > 50 ? " warn"
-      : ""
-  );
-
-  el("loss-components").textContent =
-    ratioPct === null
-      ? usd(claimsPaid) + " claimed / no premium collected yet"
-      : usd(claimsPaid) + " claims / " + usd(premiums) + " premium";
-
+  // Below the credibility threshold we do not print the ratio at all. Showing a number and
+  // disclaiming it in the same breath is incoherent: either it means something or it does not.
+  // What we show instead are the two quantities that ARE facts — claims paid and premium
+  // collected, both verified — so nothing is concealed. Anyone can divide them; the page simply
+  // declines to call the result a rate.
   const bench = el("loss-bench");
+
   if (!credible) {
-    bench.textContent = "insufficient exposure · not a rate";
+    el("loss-ratio").textContent = "n/a";
+    el("loss-ratio").className = "v uncredible";
+    el("loss-components").textContent =
+      usd(claimsPaid) + " claims paid · " + usd(premiums) + " premium collected";
+    bench.textContent = "insufficient exposure";
     bench.className = "bench muted";
     el("loss-note").textContent =
-      "Book of " + written + (written === 1 ? " policy" : " policies") + ", far below the " +
-      "exposure a loss ratio needs to carry credibility — credit life prices for roughly one " +
-      "death per thousand policy-years. What this demonstrates is that the figure is a " +
-      "computation over cryptographically verified inputs, not that the book is priced badly.";
+      "A loss ratio needs exposure to mean anything, and this book has " + written +
+      (written === 1 ? " policy" : " policies") + ". Credit life prices for roughly one death " +
+      "per thousand policy-years, so no ratio is reported yet. Both inputs above are on-chain " +
+      "counters that only moved because an Ethereum event was cryptographically verified — " +
+      "which is the part being demonstrated.";
   } else {
+    el("loss-ratio").textContent = ratioPct === null ? "n/a" : pct(loss);
+    el("loss-ratio").className = "v" + (
+      ratioPct === null ? "" : ratioPct > 100 ? " bad" : ratioPct > 50 ? " warn" : ""
+    );
+    el("loss-components").textContent =
+      usd(claimsPaid) + " claims paid · " + usd(premiums) + " premium collected";
     bench.textContent = "BR market ~18% · unaudited estimate";
     bench.className = "bench";
     el("loss-note").textContent = "";
