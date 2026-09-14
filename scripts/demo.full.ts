@@ -86,7 +86,11 @@ async function main() {
     const contract = new ethers.Contract(
       target,
       [
-        "function executeFromSource(uint8,uint64,uint64,bytes,bytes32,(bytes32,bool)[],bytes32,bytes32[]) returns (bool)",
+        // The sibling tuple components MUST be named. toExecuteArgs passes {hash, isLeft}
+        // objects, and ethers refuses to encode an object against unnamed components
+        // ("cannot use object value with unnamed components"). verify.e2e.ts does not hit this
+        // because it loads the full artifact ABI, where the names are present.
+        "function executeFromSource(uint8 action,uint64 chainKey,uint64 headerNumber,bytes txBytes,bytes32 root,(bytes32 hash,bool isLeft)[] siblings,bytes32 lowerEndpointDigest,bytes32[] roots) returns (bool)",
       ],
       ccSigner
     );
