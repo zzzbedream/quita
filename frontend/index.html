@@ -100,6 +100,19 @@
   .metric.hero .v { font-size: 60px; color: var(--cyan); }
   .metric.hero .v.warn { color: var(--amber); }
   .metric.hero .v.bad  { color: var(--red); }
+  /* A ratio with no statistical credibility must not be dressed as a result. Muted, not red:
+     red says "this book is failing", when the truth is "there is not enough of a book yet". */
+  .metric.hero .v.uncredible { color: var(--text-2); font-size: 44px; }
+  .metric .components {
+    font-family: var(--mono); font-size: 13px; color: var(--text-2);
+    margin-top: 10px; font-variant-numeric: tabular-nums;
+  }
+  /* Must out-specify `.metric .bench`, which is (0,2,0) and defined later in this sheet. */
+  .metric .bench.muted {
+    background: rgba(148,163,184,.10);
+    color: var(--text-2);
+    font-weight: 500;
+  }
   .metric .note { font-size: 13px; color: var(--text-2); margin-top: 12px; line-height: 1.45; }
   .metric .bench {
     display: inline-block; margin-top: 12px; padding: 4px 11px;
@@ -316,7 +329,8 @@
     <div class="metric hero">
       <div class="k">Loss ratio</div>
       <div class="v" id="loss-ratio">—</div>
-      <div class="bench" title="Source: analysis of the Tema 972 litigation and industry commentary. Pending cross-check against public SUSEP statistics.">BR market ~18% &middot; unaudited estimate</div>
+      <div class="components" id="loss-components"></div>
+      <div class="bench" id="loss-bench" title="Source: analysis of the Tema 972 litigation and industry commentary. Pending cross-check against public SUSEP statistics.">BR market ~18% &middot; unaudited estimate</div>
       <div class="note" id="loss-note"></div>
     </div>
     <div class="metric">
@@ -578,19 +592,49 @@ async function renderTrust(pool, registry, mirror) {
       registry.totalSumInsured()
     ]);
 
-  const ratioPct = premiums === 0n ? null : Number(loss) / 1e18 * 100;
-  el("loss-ratio").textContent = ratioPct === null ? "n/a" : pct(loss);
-  el("loss-ratio").className = "v" +
-    (ratioPct === null ? "" : ratioPct > 100 ? " bad" : ratioPct > 50 ? " warn" : "");
+  // Credibility before presentation.
+  //
+  // A loss ratio is a statistic, and a statistic computed from one policy carries none. Credit
+  // life prices for roughly one death per thousand policy-years, so a book this size has
+  // effectively zero exposure and the figure is arithmetic, not a rate. Printing it large and
+  // red would claim something the data cannot support: it reads as a failing book rather than
+  // as an empty one.
+  //
+  // So compute it, show it, show the two numbers it divides, and refuse to dress it as a
+  // result until the book is large enough to mean anything.
+  const CREDIBLE_POLICIES = 1000;
 
-  // A ratio computed from a handful of policies is a demonstration of the mechanism, not a
-  // market-comparable figure. Say so rather than letting the number stand on its own.
-  const n = Number(active) + (Number(claimsPaid) > 0 ? 1 : 0);
-  if (ratioPct !== null && n < 100) {
+  const written = Number(await registry.policyCount().catch(() => active));
+  const ratioPct = premiums === 0n ? null : Number(loss) / 1e18 * 100;
+  const credible = written >= CREDIBLE_POLICIES;
+
+  el("loss-ratio").textContent = ratioPct === null ? "n/a" : pct(loss);
+  el("loss-ratio").className = "v" + (
+    ratioPct === null ? ""
+      : !credible ? " uncredible"
+      : ratioPct > 100 ? " bad"
+      : ratioPct > 50 ? " warn"
+      : ""
+  );
+
+  el("loss-components").textContent =
+    ratioPct === null
+      ? usd(claimsPaid) + " claimed / no premium collected yet"
+      : usd(claimsPaid) + " claims / " + usd(premiums) + " premium";
+
+  const bench = el("loss-bench");
+  if (!credible) {
+    bench.textContent = "insufficient exposure · not a rate";
+    bench.className = "bench muted";
     el("loss-note").textContent =
-      "Demo book of " + n + (n === 1 ? " policy" : " policies") +
-      ". A real book prices for roughly one death per thousand policy-years, so this is the " +
-      "mechanism working, not a comparable rate.";
+      "Book of " + written + (written === 1 ? " policy" : " policies") + ", far below the " +
+      "exposure a loss ratio needs to carry credibility — credit life prices for roughly one " +
+      "death per thousand policy-years. What this demonstrates is that the figure is a " +
+      "computation over cryptographically verified inputs, not that the book is priced badly.";
+  } else {
+    bench.textContent = "BR market ~18% · unaudited estimate";
+    bench.className = "bench";
+    el("loss-note").textContent = "";
   }
   el("solvency").textContent = mcr === 0n ? "∞" : ratio(solv);
   el("mcr-note").textContent = "MCR " + usd(mcr) + " · assets " + usd(assets);
